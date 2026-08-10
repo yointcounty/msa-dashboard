@@ -1,4 +1,4 @@
-'use client';
+ï»¿'use client';
 import Link from 'next/link';
 import { useState } from 'react';
 import { Mail, Lock, User, Zap } from 'lucide-react';
@@ -54,7 +54,7 @@ export default function SignupPage() {
               <label className="block text-gray-300 text-sm font-bold mb-2">Password</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 text-gray-500" size={18} />
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="w-full pl-10 pr-4 py-3 bg-slate-900 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#00d4ff] focus:ring-1 focus:ring-[#00d4ff] transition" required />
+                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" className="w-full pl-10 pr-4 py-3 bg-slate-900 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#00d4ff] focus:ring-1 focus:ring-[#00d4ff] transition" required />
               </div>
             </div>
 
@@ -62,7 +62,7 @@ export default function SignupPage() {
               <label className="block text-gray-300 text-sm font-bold mb-2">Confirm Password</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 text-gray-500" size={18} />
-                <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="••••••••" className="w-full pl-10 pr-4 py-3 bg-slate-900 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#00d4ff] focus:ring-1 focus:ring-[#00d4ff] transition" required />
+                <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" className="w-full pl-10 pr-4 py-3 bg-slate-900 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#00d4ff] focus:ring-1 focus:ring-[#00d4ff] transition" required />
               </div>
             </div>
 

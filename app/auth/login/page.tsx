@@ -1,4 +1,4 @@
-'use client';
+ï»¿'use client';
 import Link from 'next/link';
 import { useState } from 'react';
 import { Mail, Lock, Zap } from 'lucide-react';
@@ -51,7 +51,7 @@ export default function LoginPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                   className="w-full pl-10 pr-4 py-3 bg-slate-900 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#00ff41] focus:ring-1 focus:ring-[#00ff41] transition"
                   required
                 />
