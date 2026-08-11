@@ -30,7 +30,7 @@ type MediaItem = { id: string; storage_path: string; kind: string; caption?: str
 type MediaCard = { title: string; src: string; type: string; date: string };
 
 const fallbackMedia: MediaCard[] = [
-  { title: 'Academy highlight', src: '/media/3-Photo-3.jpg', type: 'video', date: 'Academy highlight' },
+  { title: 'Academy highlight', src: '/media/3-Photo-3.jpg', type: 'photo', date: 'Academy highlight' },
   { title: 'Park session', src: '/media/1-Photo-1.jpg', type: 'photo', date: 'Academy highlight' },
   { title: 'Finding the line', src: '/media/8-Photo-8.jpg', type: 'photo', date: 'Academy highlight' },
 ];
