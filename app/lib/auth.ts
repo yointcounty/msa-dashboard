@@ -1,37 +1,50 @@
-export type ParentAccount = { parentName: string; email: string; childName: string; program: string; passwordHash: string };
+import { supabase } from './supabase';
 
-const ACCOUNT_KEY = 'msa-parent-account';
-const SESSION_KEY = 'msa-parent-session';
+export type ParentAccount = {
+  id: string;
+  parentName: string;
+  email: string;
+  childName: string;
+  skaterId: string;
+  role: 'family' | 'coach';
+};
 
-async function hashPassword(value: string) {
-  const bytes = new TextEncoder().encode(value);
-  const digest = await crypto.subtle.digest('SHA-256', bytes);
-  return Array.from(new Uint8Array(digest)).map((byte) => byte.toString(16).padStart(2, '0')).join('');
-}
-
-export async function createAccount(account: Omit<ParentAccount, 'passwordHash'> & { password: string }) {
-  const passwordHash = await hashPassword(account.password);
-  const saved: ParentAccount = { parentName: account.parentName, email: account.email.toLowerCase(), childName: account.childName, program: account.program, passwordHash };
-  localStorage.setItem(ACCOUNT_KEY, JSON.stringify(saved));
-  localStorage.setItem(SESSION_KEY, saved.email);
-  return saved;
+export async function createAccount(account: { parentName: string; email: string; childName: string; password: string }) {
+  const { data, error } = await supabase.auth.signUp({
+    email: account.email.toLowerCase(),
+    password: account.password,
+    options: { emailRedirectTo: `${window.location.origin}/auth/login`, data: { parent_name: account.parentName, child_name: account.childName } },
+  });
+  if (error) throw error;
+  return { needsConfirmation: !data.session };
 }
 
 export async function signIn(email: string, password: string) {
-  const raw = localStorage.getItem(ACCOUNT_KEY);
-  if (!raw) throw new Error('No portal account found on this device. Activate access first.');
-  const account = JSON.parse(raw) as ParentAccount;
-  if (account.email !== email.toLowerCase() || account.passwordHash !== await hashPassword(password)) throw new Error('That email or password does not match your account.');
-  localStorage.setItem(SESSION_KEY, account.email);
-  return account;
+  const { data, error } = await supabase.auth.signInWithPassword({ email: email.toLowerCase(), password });
+  if (error) throw error;
+  const { data: profile, error: profileError } = await supabase.from('profiles').select('role').eq('id', data.user.id).single();
+  if (profileError) throw profileError;
+  return profile as { role: 'family' | 'coach' };
 }
 
-export function getAccount() {
-  const raw = localStorage.getItem(ACCOUNT_KEY);
-  const session = localStorage.getItem(SESSION_KEY);
-  if (!raw || !session) return null;
-  const account = JSON.parse(raw) as ParentAccount;
-  return account.email === session ? account : null;
+export async function getAccount(): Promise<ParentAccount | null> {
+  const { data: authData } = await supabase.auth.getUser();
+  if (!authData.user) return null;
+  const [{ data: profile }, { data: skater }] = await Promise.all([
+    supabase.from('profiles').select('parent_name, email, role').eq('id', authData.user.id).single(),
+    supabase.from('skaters').select('id, name').eq('parent_user_id', authData.user.id).limit(1).maybeSingle(),
+  ]);
+  if (!profile || profile.role !== 'family' || !skater) return null;
+  return {
+    id: authData.user.id,
+    parentName: profile.parent_name || 'MSA Family',
+    email: profile.email,
+    childName: skater.name,
+    skaterId: skater.id,
+    role: profile.role,
+  };
 }
 
-export function signOut() { localStorage.removeItem(SESSION_KEY); }
+export async function signOut() {
+  await supabase.auth.signOut();
+}

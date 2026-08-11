@@ -19,6 +19,13 @@
 .status-learning { background:#fff2b9; }.status-consistent { background:#dff6bd; }.status-mastered { background:var(--green); }
 .coach-lock { display:flex; align-items:center; gap:7px; font-size:12px; color:#667069; margin:18px 0 0; }
 .muted { color:#5e675f; }
+.notification-card { grid-column:1/-1; }
+.notification-list { display:grid; gap:0; }
+.notification-row { display:flex; gap:12px; padding:15px 0; border-bottom:1px solid #e2e5e0; }
+.notification-row>span { width:9px; height:9px; border-radius:50%; background:#bac1ba; margin-top:5px; }
+.notification-row.unread>span { background:var(--green); box-shadow:0 0 0 4px #e7f5bd; }
+.notification-row>div { display:flex; flex-direction:column; gap:4px; }
+.notification-row small { color:#778078; }
 .modal-backdrop { position:fixed; z-index:100; inset:0; background:rgba(8,12,10,.72); display:grid; place-items:center; padding:20px; }
 .install-modal { position:relative; background:var(--paper); border:3px solid var(--ink); box-shadow:9px 9px 0 var(--green); max-width:480px; width:100%; padding:36px; }
 .install-modal h2 { font-size:42px; margin:18px 0; }.install-modal ol { padding-left:22px; }.install-modal li { padding:8px 0; line-height:1.5; }.install-modal li svg { vertical-align:middle; }
