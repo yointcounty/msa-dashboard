@@ -1,24 +1,15 @@
-'use client';
-import Image from 'next/image';
+﻿'use client';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { signIn } from '../../lib/auth';
-import '../auth.css';
+import { Mail, Lock, Zap } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+  ? createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) : null;
 
 export default function LoginPage() {
-  const router = useRouter(); const [show, setShow] = useState(false); const [status, setStatus] = useState(''); const [busy, setBusy] = useState(false);
-  async function submit(e: React.FormEvent<HTMLFormElement>) { e.preventDefault(); setBusy(true); setStatus(''); const data = new FormData(e.currentTarget); try { const profile = await signIn(String(data.get('email')), String(data.get('password'))); router.push(profile.role === 'coach' ? '/coach' : '/dashboard'); } catch (error) { setStatus(error instanceof Error ? error.message : 'Unable to sign in.'); setBusy(false); } }
-  return <main className="auth-shell">
-    <section className="auth-visual"><Image src="/images/msa-lessons.jpg" alt="Miami Skate Academy community at the skatepark" fill priority sizes="(max-width: 900px) 100vw, 50vw"/><div className="auth-visual-copy"><h2>WELCOME BACK<br/><em>TO THE CREW.</em></h2><p>Schedules, milestones, and coach updates—all in one family-friendly place.</p></div></section>
-    <section className="auth-panel"><Link href="/" className="brand-lockup"><span className="brand-mark">MSA</span><span><b>MIAMI SKATE</b><small>ACADEMY</small></span></Link><Link href="/" className="back-link"><ArrowLeft size={15}/> Home</Link>
-      <div className="auth-card"><p className="eyebrow"><span/> Parent portal</p><h1>SIGN IN.</h1><p>Pick up right where your skater left off.</p>
-        <form onSubmit={submit}><div className="field"><label htmlFor="email">Parent email</label><input id="email" name="email" type="email" autoComplete="email" required placeholder="you@example.com"/></div><div className="field"><div className="password-row"><label htmlFor="password">Password</label><button type="button" onClick={()=>setShow(!show)}>{show?'Hide':'Show'}</button></div><input id="password" name="password" type={show?'text':'password'} autoComplete="current-password" required minLength={8} placeholder="8+ characters"/></div>{status&&<div className="form-status error" role="alert">{status}</div>}<button className="button" disabled={busy}>{busy?'Signing in…':<>Sign in <ArrowRight size={18}/></>}</button></form>
-        <p className="auth-switch">Enrolled but new to the portal? <Link href="/auth/signup">Activate access</Link></p>
-        <p className="auth-switch">MSA coach? <Link href="/coach">Open coach portal</Link></p>
-        <div className="not-enrolled"><b>Not enrolled yet?</b><a href="https://miamiskateacademy.com" target="_blank" rel="noreferrer">Enroll at MiamiSkateAcademy.com</a><a href="sms:+17863947314">Text 786-394-7314</a></div>
-      </div>
-    </section>
-  </main>;
+  const router=useRouter(); const [email,setEmail]=useState(''); const [password,setPassword]=useState(''); const [error,setError]=useState('');
+  async function submit(e:React.FormEvent){e.preventDefault();setError(''); if(!supabase){router.push('/');return;} const {error}=await supabase.auth.signInWithPassword({email,password}); if(error)setError(error.message); else router.push('/');}
+  return <div className="auth-shell"><div className="auth-card"><div className="auth-logo"><div className="brand-mark"><Zap size={19} fill="currentColor"/></div><h1>MIAMI SKATE</h1><span>ACADEMY</span></div><p className="eyebrow">PARENT PORTAL</p><h2>Welcome back</h2><p className="auth-subtitle">Sign in to see your skater’s latest progress.</p><form onSubmit={submit}><label>Email<input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" required/></label><label>Password<input type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••••" required/></label>{error&&<p className="auth-error">{error}</p>}<button className="primary-button auth-submit">Sign in <span>→</span></button></form><p className="auth-footer">New to the academy? <Link href="/auth/signup">Create an account</Link></p><Link href="/" className="back-link">← Back to portal</Link></div></div>;
 }

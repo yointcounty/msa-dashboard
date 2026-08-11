@@ -1,81 +1,30 @@
-'use client';
-
-import Image from 'next/image';
-import Link from 'next/link';
+﻿'use client';
 import { useState } from 'react';
-import { ArrowRight, CalendarDays, Check, ChevronDown, Menu, ShieldCheck, Smartphone, Sparkles, Trophy, Users, X } from 'lucide-react';
-import InstallAppButton from './install-app';
-import './home-app.css';
+import { Bell, CalendarDays, Check, ChevronRight, CloudUpload, Image as ImageIcon, LayoutDashboard, LogOut, Menu, MessageCircle, Settings, Sparkles, Target, Trophy, Zap, Play } from 'lucide-react';
 
-const faqs = [
-  ['Is MSA beginner-friendly?', 'Absolutely. Coaches meet each skater at their current level and focus first on safety, balance, board control, and confidence.'],
-  ['Where do lessons happen?', 'Lessons can take place at local skateparks, nearby public parks, or an appropriate home practice area across Miami, Hollywood, and nearby South Florida communities.'],
-  ['What can skaters and parents track?', 'The private dashboard brings upcoming sessions, trick checklists, progress milestones, and coach notes into one easy place.'],
+const skills = ['Stance & balance','Safe falling','Pushing & stopping','Carving turns','Kick turns'];
+const upcoming = ['Drop-ins','Ollie basics'];
+const sessions = [
+  ['08','SAT','Wynwood Skatepark','Coach Maya'],
+  ['05','WED','Miami Beach Ramp','Coach Jordan'],
+  ['01','SAT','Wynwood Skatepark','Coach Maya'],
 ];
-
 export default function Home() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [openFaq, setOpenFaq] = useState<number | null>(0);
-
-  return (
-    <main className="site-shell">
-      <nav className="topbar" aria-label="Primary navigation">
-        <Link href="/" className="brand-lockup" aria-label="Miami Skate Academy home">
-          <span className="brand-mark">MSA</span>
-          <span><b>MIAMI SKATE</b><small>ACADEMY</small></span>
-        </Link>
-        <div className="desktop-nav">
-          <a href="#app">Progress</a><a href="#families">For families</a><a href="#faq">FAQ</a>
-        </div>
-        <div className="nav-actions">
-          <InstallAppButton compact/><Link href="/coach" className="coach-nav-link">Coach sign in</Link><Link href="/auth/login" className="text-link">Member sign in</Link>
-          <Link href="/auth/signup" className="button button-small">Activate access <ArrowRight size={16}/></Link>
-        </div>
-        <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu" aria-expanded={menuOpen}>{menuOpen ? <X/> : <Menu/>}</button>
-      </nav>
-      {menuOpen && <div className="mobile-menu"><a href="#app" onClick={() => setMenuOpen(false)}>Progress</a><a href="#families" onClick={() => setMenuOpen(false)}>For families</a><a href="#faq" onClick={() => setMenuOpen(false)}>FAQ</a><Link href="/coach" className="coach-nav-link">Coach sign in</Link><Link href="/auth/login">Member sign in</Link><Link href="/auth/signup" className="button">Activate access</Link></div>}
-
-      <section className="hero">
-        <div className="hero-copy">
-          <p className="eyebrow"><span/> Private member portal</p>
-          <h1>YOUR SKATE<br/>PROGRESS.<br/><em>ALL HERE.</em></h1>
-          <p className="hero-lede">A private home for enrolled MSA skaters and families to follow tricks, coach updates, milestones, and upcoming sessions.</p>
-          <div className="hero-actions">
-            <Link href="/auth/login" className="button">Member sign in <ArrowRight size={19}/></Link>
-            <InstallAppButton/>
-          </div>
-          <div className="trust-row"><div className="avatar-stack"><span>JT</span><span>MSA</span><span>YC</span></div><p><b>100+ Enrolled Members</b><small>Growing stronger, one session at a time</small></p></div>
-        </div>
-        <div className="hero-media">
-          <Image src="/images/msa-coaching.jpg" alt="Miami Skate Academy coaches and young skaters at the skatepark" fill priority sizes="(max-width: 900px) 100vw, 50vw"/>
-          <div className="hero-sticker"><Trophy size={24}/><b>SKATE.<br/>GROW.<br/>BELONG.</b></div>
-          <div className="session-card"><span className="pulse"/><div><small>NEXT UP</small><b>Weekend Team Session</b><span>Saturday · 10:00 AM</span></div><CalendarDays size={24}/></div>
-        </div>
-      </section>
-
-      <section className="proof-strip" aria-label="Academy highlights">
-        <div><strong>100+</strong><span>ENROLLED MEMBERS</span></div><div><strong>4:1</strong><span>GROUP COACH RATIO</span></div><div><strong>3</strong><span>SOUTH FLORIDA AREAS</span></div><div><strong>ALL</strong><span>SKILL LEVELS WELCOME</span></div>
-      </section>
-
-      <section className="app-preview-section" id="app">
-        <div className="app-preview-copy"><p className="eyebrow"><span/> The MSA skater app</p><h2>EVERY TRICK.<br/><em>EVERY WIN.</em></h2><p>Install the private portal and see exactly what your skater is learning—from the first drop-in to a clean kickflip. Coaches update progress after sessions; families celebrate the climb.</p><InstallAppButton/></div>
-        <div className="phone-preview"><div className="phone-top"><span className="brand-mark">MSA</span><small>ALEX’S ROADMAP</small><Smartphone/></div><h3>MAIN TRICK CHECKLIST</h3><div className="preview-tricks"><div className="preview-trick"><span className="preview-check done"><Check size={17}/></span><span><b>Kickturn</b><small>Strong control both ways</small></span><span className="preview-status green">Mastered</span></div><div className="preview-trick"><span className="preview-check"/><span><b>Ollie</b><small>Rolling ollies are landing</small></span><span className="preview-status green">Consistent</span></div><div className="preview-trick"><span className="preview-check"/><span><b>Drop-in</b><small>Building commitment</small></span><span className="preview-status">Learning</span></div><div className="preview-trick"><span className="preview-check"/><span><b>Kickflip</b><small>Next milestone</small></span><span className="preview-status">Not started</span></div></div></div>
-        <div className="app-badge">INSTALL<br/>THE APP</div>
-      </section>
-
-      <section className="family-section" id="families">
-        <div className="family-photo"><Image src="/images/msa-session.jpg" alt="An MSA coach celebrating with a young skater" fill sizes="(max-width: 900px) 100vw, 48vw"/><div className="photo-caption"><Sparkles/><span><b>Real progress.</b><small>Celebrated together.</small></span></div></div>
-        <div className="family-copy"><p className="eyebrow"><span/> Built for busy families</p><h2>YOUR SKATER’S<br/>JOURNEY, <em>IN VIEW.</em></h2><p>The MSA Parent Portal keeps the details close and the progress clear, so you can spend less time chasing updates and more time cheering.</p>
-          <ul><li><CalendarDays/><span><b>Session schedule</b><small>See what’s next and stay ready.</small></span></li><li><Trophy/><span><b>Progress milestones</b><small>Follow skills as they click.</small></span></li><li><ShieldCheck/><span><b>Coach updates</b><small>Stay connected after every session.</small></span></li></ul>
-          <Link href="/auth/login" className="button button-dark">Open parent portal <ArrowRight size={18}/></Link>
-        </div>
-      </section>
-
-      <section className="section faq-section" id="faq"><div><p className="eyebrow"><span/> Good to know</p><h2>PARENT<br/><em>QUESTIONS.</em></h2><p>Everything you need before the first session. Still wondering? Call or text <a href="tel:+17863947314">786-394-7314</a>.</p></div><div className="faq-list">{faqs.map(([q,a], index) => <button key={q} className="faq-item" onClick={() => setOpenFaq(openFaq === index ? null : index)} aria-expanded={openFaq === index}><span><b>{q}</b>{openFaq === index && <p>{a}</p>}</span><ChevronDown className={openFaq === index ? 'rotated' : ''}/></button>)}</div></section>
-
-      <section className="final-cta"><div><Users/><span><small>ALREADY PART OF THE CREW?</small><h2>OPEN YOUR SKATER PORTAL.</h2></span></div><div className="final-links"><Link href="/coach" className="coach-footer-link">Coach sign in</Link><Link href="/auth/login" className="button button-light">Member sign in <ArrowRight size={19}/></Link></div></section>
-      <section className="new-family-strip"><p><b>Not enrolled with MSA yet?</b> Enrollment happens outside this private member portal.</p><div><a href="https://miamiskateacademy.com" target="_blank" rel="noreferrer">Visit MiamiSkateAcademy.com</a><a href="sms:+17863947314">Text 786-394-7314</a></div></section>
-      <footer><div className="brand-lockup"><span className="brand-mark">MSA</span><span><b>MIAMI SKATE</b><small>ACADEMY</small></span></div><p>Miami Skate Academy · Part of Yoint County</p><div><a href="tel:+17863947314">786-394-7314</a><a href="mailto:jt@yointcounty.com">jt@yointcounty.com</a></div></footer>
-    </main>
-  );
+  const [active,setActive]=useState('Overview'); const [open,setOpen]=useState(false); const [uploaded,setUploaded]=useState(false);
+  const nav=[['Overview',LayoutDashboard],['Progress',Trophy],['Sessions',CalendarDays],['Media',ImageIcon],['Goals',Target]] as const;
+  const goTo=(section:string)=>{setActive(section); if(section!=='Overview') document.getElementById(section.toLowerCase()+'-section')?.scrollIntoView({behavior:'smooth',block:'start'});};
+  return <main className="app-shell">
+    <aside className={`sidebar ${open?'open':''}`}><div className="brand"><div className="brand-mark"><Zap size={18} fill="currentColor"/></div><div><strong>MIAMI SKATE</strong><span>ACADEMY</span></div></div><div className="parent-chip"><div className="avatar small">AM</div><div><span>Parent portal</span><strong>Alex Morgan</strong></div><ChevronRight size={15}/></div><nav>{nav.map(([label,Icon])=><button key={label} className={active===label?'active':''} onClick={()=>{goTo(label);setOpen(false)}}><Icon size={18}/><span>{label}</span>{label==='Media'&&<i>3</i>}</button>)}</nav><div className="sidebar-bottom"><button><MessageCircle size={18}/>Message coach</button><button><Settings size={18}/>Settings</button><button><LogOut size={18}/>Sign out</button></div></aside>
+    <section className="content" id="overview-section"><header className="topbar"><button className="icon-button mobile-menu" onClick={()=>setOpen(!open)}><Menu size={20}/></button><div><p className="eyebrow">SATURDAY, AUGUST 8, 2026</p><h1>Good morning, Alex <span>✦</span></h1></div><div className="top-actions"><button className="icon-button"><Bell size={19}/><b/></button><div className="avatar">AM</div></div></header>
+      <div className="child-switcher"><div className="child-info"><div className="avatar child">OS</div><div><span>Tracking progress for</span><strong>Olivia Morgan <em>Age 9</em></strong></div></div><button>Switch child <ChevronRight size={15}/></button></div>
+      <div className="hero-grid"><section className="welcome-card card"><div className="hero-copy"><div className="tag"><Sparkles size={13}/> THIS WEEK</div><h2>Keep rolling,<br/><span>Olivia!</span></h2><p>Small pushes make big progress. Olivia is building a strong foundation and gaining confidence every session.</p><button className="primary-button" onClick={()=>goTo('Progress')}>View full progress <ChevronRight size={15}/></button></div><div className="hero-art"><img onError={(e)=>{e.currentTarget.style.display="none"}} src="/media/3-Photo-3.jpg" alt="Olivia skating at the park" /><div className="hero-overlay"/></div></section><section className="progress-card card"><div className="section-heading"><div><span className="muted-label">OVERALL PROGRESS</span><h3>Level 2 · Rolling</h3></div><div className="progress-number">68<span>%</span></div></div><div className="progress-track"><div/></div><div className="progress-meta"><span><Trophy size={14}/> 5 skills mastered</span><span>2 to next level</span></div><div className="mini-achievement"><div className="medal"><Trophy size={17}/></div><div><strong>New personal best!</strong><span>5 kick turns in a row</span></div><ChevronRight size={15}/></div></section></div>
+      <SectionTitle label="YOUR CHILD" title="Progress snapshot" action="See all progress" onClick={()=>goTo('Progress')}/><div className="snapshot-grid" id="progress-section"><section className="card skills-card"><div className="card-title"><div><h3>Skills tracker</h3><span>5 of 7 skills completed</span></div><div className="circle-progress">5<small>/ 7</small></div></div><div className="skills-list">{skills.map(s=><div className="skill-row" key={s}><div className="skill-check done"><Check size={12}/></div><span>{s}</span></div>)}{upcoming.map(s=><div className="skill-row" key={s}><div className="skill-check"/><span className="up-next">{s}</span><small>UP NEXT</small></div>)}</div></section><section className="card focus-card" id="goals-section"><div className="card-title"><div><h3>Coach note</h3><span>Updated Aug 8 by Coach Maya</span></div><Target className="accent-icon" size={21}/></div><div className="focus-main"><div className="focus-icon"><Zap size={20}/></div><div><h4>Building confidence</h4><p>“Olivia is ready to challenge herself with new ramps. We’re focusing on committing to the drop-in and trusting her balance.”</p></div></div><div className="focus-tags"><span>Drop-ins</span><span>Ramp confidence</span><span>Balance</span></div><button className="outline-button" onClick={()=>goTo('Goals')}>View weekly goals <ChevronRight size={15}/></button></section></div>
+      <SectionTitle label="RECENT ACTIVITY" title="Session history" action="View all sessions" onClick={()=>goTo('Sessions')}/><section className="card sessions-card" id="sessions-section">{sessions.map(([day,weekday,location,coach])=><div className="session-row" key={day}><div className="date-badge"><strong>{day}</strong><span>{weekday}</span></div><div className="session-info"><h4>{location}</h4><span>{coach} · August {day}, 2026</span></div><ChevronRight size={17} className="row-arrow"/></div>)}</section>
+      <div className="section-title media-heading"><div><span className="muted-label">MEMORIES</span><h2>Latest media</h2></div><label className="upload-button"><CloudUpload size={15}/> {uploaded?'Added!':'Upload'}<input type="file" accept="image/*,video/*" onChange={()=>setUploaded(true)}/></label></div><div className="media-grid" id="media-section"><div className="media-tile"><div className="media-art"><img onError={(e)=>{e.currentTarget.style.display="none"}} src="/media/3-Photo-3.jpg" alt="Kick turn progress"/><div className="play"><Play size={17} fill="white"/></div><span className="duration">0:18</span></div><div className="media-caption"><div><strong>Kick turn progress</strong><span>Aug 8, 2026</span></div><ChevronRight size={15}/></div></div><div className="media-tile"><div className="media-art"><img onError={(e)=>{e.currentTarget.style.display="none"}} src="/media/1-Photo-1.jpg" alt="Saturday session"/></div><div className="media-caption"><div><strong>Saturday session</strong><span>Aug 8, 2026</span></div><ChevronRight size={15}/></div></div><div className="media-tile"><div className="media-art"><img onError={(e)=>{e.currentTarget.style.display="none"}} src="/media/8-Photo-8.jpg" alt="Finding the line"/></div><div className="media-caption"><div><strong>Finding the line</strong><span>Aug 8, 2026</span></div><ChevronRight size={15}/></div></div></div><footer>Miami Skate Academy <span>·</span> Helping young skaters find their flow.</footer>
+    </section></main>;
 }
+function SectionTitle({label,title,action,onClick}:{label:string,title:string,action:string,onClick:()=>void}){return <div className="section-title"><div><span className="muted-label">{label}</span><h2>{title}</h2></div><button className="text-button" onClick={onClick}>{action} <ChevronRight size={14}/></button></div>}
+
+
+
+

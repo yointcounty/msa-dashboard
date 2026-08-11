@@ -1,14 +1,82 @@
-'use client';
-import Image from 'next/image';
+﻿'use client';
+
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
-import { createAccount } from '../../lib/auth';
-import '../auth.css';
+import { Lock, Mail, User, Zap } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { getAuthRedirectUrl, supabase } from '../../lib/supabase-browser';
 
 export default function SignupPage() {
-  const router = useRouter(); const [status, setStatus] = useState(''); const [busy, setBusy] = useState(false);
-  async function submit(event: React.FormEvent<HTMLFormElement>) { event.preventDefault(); setStatus(''); const data = new FormData(event.currentTarget); const password = String(data.get('password')); if (password !== String(data.get('confirm'))) { setStatus('Passwords do not match.'); return; } setBusy(true); try { const result = await createAccount({ parentName: String(data.get('parentName')), email: String(data.get('email')), childName: String(data.get('childName')), password }); if (result.needsConfirmation) { setStatus('Check your email to confirm your portal account, then sign in.'); setBusy(false); } else router.push('/dashboard'); } catch (error) { setStatus(error instanceof Error ? error.message : 'Unable to activate access.'); setBusy(false); } }
-  return <main className="auth-shell"><section className="auth-visual"><Image src="/images/msa-coaching.jpg" alt="Miami Skate Academy skaters and coaches" fill priority sizes="(max-width: 900px) 100vw, 50vw"/><div className="auth-visual-copy"><h2>YOUR CREW.<br/><em>YOUR PROGRESS.</em></h2><p><Check size={17}/> For currently enrolled MSA skaters and their families.</p></div></section><section className="auth-panel"><Link href="/" className="brand-lockup"><span className="brand-mark">MSA</span><span><b>MIAMI SKATE</b><small>SKATER PORTAL</small></span></Link><Link href="/" className="back-link"><ArrowLeft size={15}/> Home</Link><div className="auth-card"><p className="eyebrow"><span/> Enrolled members only</p><h1>ACTIVATE.</h1><p>Create private portal access for an already-enrolled MSA skater. There are no programs to choose or purchase here.</p><form onSubmit={submit}><div className="form-grid"><div className="field"><label htmlFor="parentName">Parent name</label><input id="parentName" name="parentName" required autoComplete="name"/></div><div className="field"><label htmlFor="childName">Skater name</label><input id="childName" name="childName" required/></div></div><div className="field"><label htmlFor="email">Parent email</label><input id="email" name="email" type="email" required autoComplete="email"/></div><div className="form-grid"><div className="field"><label htmlFor="password">Create password</label><input id="password" name="password" type="password" minLength={8} required autoComplete="new-password"/></div><div className="field"><label htmlFor="confirm">Confirm password</label><input id="confirm" name="confirm" type="password" minLength={8} required autoComplete="new-password"/></div></div><label className="member-confirm"><input type="checkbox" required/> I confirm this skater is already enrolled with Miami Skate Academy.</label>{status && <div className="form-status error" role="alert">{status}</div>}<button className="button" disabled={busy}>{busy ? 'Activating…' : <>Activate portal <ArrowRight size={18}/></>}</button></form><p className="auth-switch">Already activated? <Link href="/auth/login">Sign in</Link></p><div className="not-enrolled"><b>Not enrolled yet?</b><a href="https://miamiskateacademy.com" target="_blank" rel="noreferrer">Enroll at MiamiSkateAcademy.com</a><a href="sms:+17863947314">Text 786-394-7314</a></div></div></section></main>;
+  const router = useRouter();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  async function submit(event: React.FormEvent) {
+    event.preventDefault();
+    setError('');
+    setMessage('');
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+    if (password.length < 6) {
+      setError('Use a password with at least 6 characters.');
+      return;
+    }
+    if (!supabase) {
+      setError('Supabase is not configured. Add the public Supabase URL and key to your environment.');
+      return;
+    }
+
+    setLoading(true);
+    const { data, error: signupError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: getAuthRedirectUrl(),
+        data: { parent_name: name },
+      },
+    });
+    setLoading(false);
+
+    if (signupError) {
+      setError(signupError.message);
+      return;
+    }
+
+    if (data.session) {
+      router.replace('/');
+    } else {
+      setMessage('Check your email to confirm your account. The button in the email will bring you back to the portal.');
+    }
+  }
+
+  return (
+    <div className="auth-shell">
+      <div className="auth-card">
+        <div className="auth-logo"><div className="brand-mark"><Zap size={19} fill="currentColor" /></div><h1>MIAMI SKATE</h1><span>ACADEMY</span></div>
+        <p className="eyebrow">PARENT PORTAL</p>
+        <h2>Create your account</h2>
+        <p className="auth-subtitle">Stay connected to your skater’s progress.</p>
+        <form onSubmit={submit}>
+          <label>Parent name<input value={name} onChange={(event) => setName(event.target.value)} placeholder="Your name" required /></label>
+          <label>Email<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" required /></label>
+          <label>Password<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="At least 6 characters" required /></label>
+          <label>Confirm password<input type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} placeholder="Repeat your password" required /></label>
+          {error && <p className="auth-error">{error}</p>}
+          {message && <p className="auth-success">{message}</p>}
+          <button type="submit" className="primary-button auth-submit" disabled={loading}>{loading ? 'Creating account…' : 'Create account'} <span>→</span></button>
+        </form>
+        <p className="auth-footer">Already have an account? <Link href="/auth/login">Sign in</Link></p>
+        <Link href="/" className="back-link">← Back to portal</Link>
+      </div>
+    </div>
+  );
 }
+
