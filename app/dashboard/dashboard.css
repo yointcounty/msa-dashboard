@@ -1,0 +1,31 @@
+.install-nav-button { display:flex!important; align-items:center; gap:6px; border-color:var(--green)!important; color:var(--green)!important; }
+.install-app-card { display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:18px; background:#fff; border:2px solid var(--ink); box-shadow:5px 5px 0 var(--green); padding:18px 22px; margin-bottom:24px; }
+.install-app-icon { width:49px; height:49px; border-radius:50%; background:var(--green); display:grid; place-items:center; border:2px solid var(--ink); }
+.install-app-card>div:nth-child(2) { display:flex; flex-direction:column; gap:3px; }
+.install-app-card small,.card-heading-row small { font-size:9px; font-weight:900; letter-spacing:2px; color:#5f8105; }
+.install-app-card span { font-size:13px; color:#5c655e; }
+.trick-card { grid-column:1/-1; }
+.card-heading-row { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid #d9ded8; padding-bottom:18px; }
+.card-heading-row h2 { margin:5px 0 0; }
+.card-heading-row>svg { color:#6d9509; width:35px; height:35px; }
+.trick-list { display:grid; grid-template-columns:1fr 1fr; column-gap:35px; }
+.trick-row { display:flex; gap:14px; padding:20px 0; border-bottom:1px solid #e2e5e0; }
+.trick-check { width:29px; height:29px; flex:0 0 29px; border:2px solid #a9b1aa; border-radius:50%; display:grid; place-items:center; }
+.trick-check.done { background:var(--green); border-color:var(--ink); }
+.trick-details { flex:1; }
+.trick-details>div:first-child { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.trick-details p { font-size:12px; color:#697069; margin:5px 0 9px; }
+.status-pill { font-size:9px; text-transform:uppercase; letter-spacing:.7px; font-weight:900; border-radius:20px; padding:5px 8px; background:#ecefea; }
+.status-learning { background:#fff2b9; }.status-consistent { background:#dff6bd; }.status-mastered { background:var(--green); }
+.coach-lock { display:flex; align-items:center; gap:7px; font-size:12px; color:#667069; margin:18px 0 0; }
+.muted { color:#5e675f; }
+.modal-backdrop { position:fixed; z-index:100; inset:0; background:rgba(8,12,10,.72); display:grid; place-items:center; padding:20px; }
+.install-modal { position:relative; background:var(--paper); border:3px solid var(--ink); box-shadow:9px 9px 0 var(--green); max-width:480px; width:100%; padding:36px; }
+.install-modal h2 { font-size:42px; margin:18px 0; }.install-modal ol { padding-left:22px; }.install-modal li { padding:8px 0; line-height:1.5; }.install-modal li svg { vertical-align:middle; }
+.modal-close { position:absolute; right:15px; top:15px; border:0; background:transparent; cursor:pointer; }
+@media(max-width:900px) { .trick-list { grid-template-columns:1fr; } }
+@media(max-width:560px) {
+  .dash-user>span { display:none; }.install-nav-button { font-size:0; }.install-nav-button svg { width:18px; height:18px; }
+  .install-app-card { grid-template-columns:auto 1fr; }.install-app-card>button { grid-column:1/-1; }
+  .install-modal { padding:30px 25px; }.install-modal h2 { font-size:35px; }
+}
