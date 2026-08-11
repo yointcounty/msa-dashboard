@@ -3,7 +3,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
-import { ArrowRight, CalendarDays, ChevronDown, Menu, ShieldCheck, Sparkles, Trophy, Users, X } from 'lucide-react';
+import { ArrowRight, CalendarDays, Check, ChevronDown, Menu, ShieldCheck, Smartphone, Sparkles, Trophy, Users, X } from 'lucide-react';
+import InstallAppButton from './install-app';
+import './home-app.css';
 
 const programs = [
   { title: 'Private Lessons', copy: 'One-on-one coaching built around your skater’s pace, goals, and confidence.', tag: 'Most focused', image: '/images/msa-session.jpg' },
@@ -32,7 +34,7 @@ export default function Home() {
           <a href="#programs">Programs</a><a href="#families">For families</a><a href="#faq">FAQ</a>
         </div>
         <div className="nav-actions">
-          <Link href="/auth/login" className="text-link">Sign in</Link>
+          <InstallAppButton compact/><Link href="/auth/login" className="text-link">Sign in</Link>
           <Link href="/auth/signup" className="button button-small">Enroll now <ArrowRight size={16}/></Link>
         </div>
         <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu" aria-expanded={menuOpen}>{menuOpen ? <X/> : <Menu/>}</button>
@@ -43,10 +45,10 @@ export default function Home() {
         <div className="hero-copy">
           <p className="eyebrow"><span/> Miami’s skateboarding home</p>
           <h1>CONFIDENCE<br/>STARTS ON<br/><em>THE BOARD.</em></h1>
-          <p className="hero-lede">Safe, high-energy skateboarding instruction for kids—plus one simple place for parents to follow every win.</p>
+          <p className="hero-lede">Safe, high-energy skateboarding instruction for kids—plus one simple app for parents to follow every win.</p>
           <div className="hero-actions">
             <Link href="/auth/signup" className="button">Enroll your skater <ArrowRight size={19}/></Link>
-            <a href="#programs" className="button button-ghost">Explore programs</a>
+            <InstallAppButton/>
           </div>
           <div className="trust-row"><div className="avatar-stack"><span>JT</span><span>MSA</span><span>YC</span></div><p><b>100+ Enrolled Members</b><small>Growing stronger, one session at a time</small></p></div>
         </div>
@@ -59,6 +61,12 @@ export default function Home() {
 
       <section className="proof-strip" aria-label="Academy highlights">
         <div><strong>100+</strong><span>ENROLLED MEMBERS</span></div><div><strong>4:1</strong><span>GROUP COACH RATIO</span></div><div><strong>3</strong><span>SOUTH FLORIDA AREAS</span></div><div><strong>ALL</strong><span>SKILL LEVELS WELCOME</span></div>
+      </section>
+
+      <section className="app-preview-section" id="app">
+        <div className="app-preview-copy"><p className="eyebrow"><span/> The MSA skater app</p><h2>EVERY TRICK.<br/><em>EVERY WIN.</em></h2><p>Install the private portal and see exactly what your skater is learning—from the first drop-in to a clean kickflip. Coaches update progress after sessions; families celebrate the climb.</p><InstallAppButton/></div>
+        <div className="phone-preview"><div className="phone-top"><span className="brand-mark">MSA</span><small>ALEX’S ROADMAP</small><Smartphone/></div><h3>MAIN TRICK CHECKLIST</h3><div className="preview-tricks"><div className="preview-trick"><span className="preview-check done"><Check size={17}/></span><span><b>Kickturn</b><small>Strong control both ways</small></span><span className="preview-status green">Mastered</span></div><div className="preview-trick"><span className="preview-check"/><span><b>Ollie</b><small>Rolling ollies are landing</small></span><span className="preview-status green">Consistent</span></div><div className="preview-trick"><span className="preview-check"/><span><b>Drop-in</b><small>Building commitment</small></span><span className="preview-status">Learning</span></div><div className="preview-trick"><span className="preview-check"/><span><b>Kickflip</b><small>Next milestone</small></span><span className="preview-status">Not started</span></div></div></div>
+        <div className="app-badge">INSTALL<br/>THE APP</div>
       </section>
 
       <section className="section" id="programs">
