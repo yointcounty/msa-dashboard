@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Lock, Mail, User, Zap } from 'lucide-react';
+import { Zap } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { getAuthRedirectUrl, supabase } from '../../lib/supabase-browser';
 

@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import {
   Bell,
   CalendarDays,
@@ -12,7 +12,6 @@ import {
   LogOut,
   Menu,
   MessageCircle,
-  Settings,
   Sparkles,
   Target,
   Trophy,
@@ -56,7 +55,8 @@ export default function Home() {
   const router = useRouter();
   const [active, setActive] = useState('Overview');
   const [open, setOpen] = useState(false);
-  const [uploaded, setUploaded] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [toast, setToast] = useState('');
   const [parentName, setParentName] = useState('Parent');
   const [child, setChild] = useState<Child | null>(null);
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -146,6 +146,39 @@ export default function Home() {
     }
   };
 
+  function notify(message: string) {
+    setToast(message);
+    window.setTimeout(() => setToast(''), 3200);
+  }
+
+  async function handleUpload(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file || !child || !supabase) return;
+    setUploading(true);
+    const safeName = file.name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-');
+    const path = `${child.id}/${crypto.randomUUID()}-${safeName}`;
+    const { error: uploadError } = await supabase.storage.from('media').upload(path, file, { upsert: false });
+    if (uploadError) {
+      setUploading(false);
+      notify('Upload failed. Please try again or ask your coach to add the media.');
+      return;
+    }
+    const { data, error: mediaError } = await supabase.from('media').insert({
+      child_id: child.id,
+      storage_path: path,
+      kind: file.type.startsWith('video/') ? 'video' : 'photo',
+      caption: file.name.replace(/\.[^.]+$/, ''),
+    }).select('id,storage_path,kind,caption,created_at').single();
+    setUploading(false);
+    if (mediaError || !data) {
+      notify('The file uploaded, but could not be added to the gallery.');
+      return;
+    }
+    setMedia((current) => [data as MediaItem, ...current]);
+    notify('Media added to your skater gallery.');
+  }
+
   async function signOut() {
     await supabase?.auth.signOut();
     router.replace('/auth/login');
@@ -166,13 +199,13 @@ export default function Home() {
         <div className="brand"><div className="brand-mark"><Zap size={18} fill="currentColor" /></div><div><strong>MIAMI SKATE</strong><span>ACADEMY</span></div></div>
         <div className="parent-chip"><div className="avatar small">{initials(parentName)}</div><div><span>Parent portal</span><strong>{parentName}</strong></div><ChevronRight size={15} /></div>
         <nav>{nav.map(([label, Icon]) => <button key={label} className={active === label ? 'active' : ''} onClick={() => { goTo(label); setOpen(false); }}><Icon size={18} /><span>{label}</span>{label === 'Media' && mediaCards.length > 0 && <i>{mediaCards.length}</i>}</button>)}</nav>
-        <div className="sidebar-bottom"><button><MessageCircle size={18} />Message coach</button><button><Settings size={18} />Settings</button><button onClick={signOut}><LogOut size={18} />Sign out</button></div>
+        <div className="sidebar-bottom"><button onClick={() => notify('Your coach will see new updates here after each session.')}><MessageCircle size={18} />Message coach</button><button onClick={signOut}><LogOut size={18} />Sign out</button></div>
       </aside>
 
       <section className="content" id="overview-section">
-        <header className="topbar"><button className="icon-button mobile-menu" onClick={() => setOpen(!open)}><Menu size={20} /></button><div><p className="eyebrow">{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase()}</p><h1>Good morning, {parentName} <span>✦</span></h1></div><div className="top-actions"><button className="icon-button"><Bell size={19} /><b /></button><div className="avatar">{initials(parentName)}</div></div></header>
+        <header className="topbar"><button className="icon-button mobile-menu" aria-label="Open navigation" onClick={() => setOpen(!open)}><Menu size={20} /></button><div><p className="eyebrow">{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase()}</p><h1>Good morning, {parentName} <span>✦</span></h1></div><div className="top-actions"><button className="icon-button" aria-label="View notifications" onClick={() => notify('No new coach updates right now.')}><Bell size={19} /></button><div className="avatar">{initials(parentName)}</div></div></header>
 
-        <div className="child-switcher"><div className="child-info"><div className="avatar child">{child ? initials(child.name) : '?'}</div><div><span>Tracking progress for</span><strong>{child ? child.name : 'No skater linked'} {child && <em>Age {child.age}</em>}</strong></div></div><button disabled={!child}>Switch child <ChevronRight size={15} /></button></div>
+        <div className="child-switcher"><div className="child-info"><div className="avatar child">{child ? initials(child.name) : '?'}</div><div><span>Tracking progress for</span><strong>{child ? child.name : 'No skater linked'} {child && <em>Age {child.age}</em>}</strong></div></div><button disabled={!child} onClick={() => notify('Only one skater is linked to this parent account.')}>One skater <ChevronRight size={15} /></button></div>
 
         {!child && <section className="empty-state card"><div className="empty-icon"><UsersIcon /></div><h2>Your skater profile is being connected</h2><p>{loadError || 'No child profile is linked to this parent account yet.'}</p><button className="primary-button" onClick={() => router.push('/auth/login')}>Return to sign in <ChevronRight size={15} /></button></section>}
 
@@ -182,8 +215,9 @@ export default function Home() {
 
         <SectionTitle label="RECENT ACTIVITY" title="Session history" action="View all sessions" onClick={() => goTo('Sessions')} /><section className="card sessions-card" id="sessions-section">{sessions.length ? sessions.map((session) => { const date = dateParts(session.session_date); return <div className="session-row" key={session.id}><div className="date-badge"><strong>{date.day}</strong><span>{date.weekday}</span></div><div className="session-info"><h4>{session.location}</h4><span>{session.coach} · {displayDate(session.session_date)}</span></div><ChevronRight size={17} className="row-arrow" /></div>; }) : <p className="empty-copy session-empty">No sessions have been logged yet.</p>}</section>
 
-        <div className="section-title media-heading"><div><span className="muted-label">MEMORIES</span><h2>Latest media</h2></div><label className="upload-button"><CloudUpload size={15} /> {uploaded ? 'Added!' : 'Upload'}<input type="file" accept="image/*,video/*" onChange={() => setUploaded(true)} /></label></div><div className="media-grid" id="media-section">{mediaCards.length ? mediaCards.map((item, index) => <div className="media-tile" key={item.title + '-' + index}><div className="media-art"><img onError={(event) => { event.currentTarget.style.display = 'none'; }} src={item.src} alt={item.title} />{item.type === 'video' && <><div className="play"><Play size={17} fill="white" /></div><span className="duration">0:18</span></>}</div><div className="media-caption"><div><strong>{item.title}</strong><span>{item.date}</span></div><ChevronRight size={15} /></div></div>) : <p className="empty-copy">Media will appear after your first session.</p>}</div>
+        <div className="section-title media-heading"><div><span className="muted-label">MEMORIES</span><h2>Latest media</h2></div><label className={'upload-button ' + (uploading ? 'is-uploading' : '')}><CloudUpload size={15} /> {uploading ? 'Uploading…' : 'Upload media'}<input type="file" accept="image/*,video/*" disabled={uploading || !child} onChange={handleUpload} /></label></div><div className="media-grid" id="media-section">{mediaCards.length ? mediaCards.map((item, index) => <div className="media-tile" key={item.title + '-' + index}><div className="media-art">{item.type === 'video' ? <video src={item.src} controls playsInline preload="metadata" aria-label={item.title} /> : <img onError={(event) => { event.currentTarget.style.display = 'none'; }} src={item.src} alt={item.title} />}{item.type === 'video' && !item.src && <div className="play"><Play size={17} fill="white" /></div>}</div><div className="media-caption"><div><strong>{item.title}</strong><span>{item.date}</span></div><ChevronRight size={15} /></div></div>) : <p className="empty-copy">Media will appear after your first session.</p>}</div>
         <footer>Miami Skate Academy <span>·</span> Helping young skaters find their flow.</footer>
+        {toast && <div className="toast" role="status">{toast}</div>}
       </section>
     </main>
   );
