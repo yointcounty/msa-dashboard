@@ -7,16 +7,10 @@ import { ArrowRight, CalendarDays, Check, ChevronDown, Menu, ShieldCheck, Smartp
 import InstallAppButton from './install-app';
 import './home-app.css';
 
-const programs = [
-  { title: 'Private Lessons', copy: 'One-on-one coaching built around your skater’s pace, goals, and confidence.', tag: 'Most focused', image: '/images/msa-session.jpg' },
-  { title: 'Small Groups', copy: 'Learn with friends in coach-led groups capped at four skaters per coach.', tag: 'Build together', image: '/images/msa-lessons.jpg' },
-  { title: 'Travel Team & Camps', copy: 'More time on the board through weekend sessions and seasonal programs.', tag: 'Level up', image: '/images/msa-coaching.jpg' },
-];
-
 const faqs = [
   ['Is MSA beginner-friendly?', 'Absolutely. Coaches meet each skater at their current level and focus first on safety, balance, board control, and confidence.'],
   ['Where do lessons happen?', 'Lessons can take place at local skateparks, nearby public parks, or an appropriate home practice area across Miami, Hollywood, and nearby South Florida communities.'],
-  ['What can parents track?', 'The parent dashboard brings upcoming sessions, progress milestones, coach notes, and enrollment details into one easy place.'],
+  ['What can skaters and parents track?', 'The private dashboard brings upcoming sessions, trick checklists, progress milestones, and coach notes into one easy place.'],
 ];
 
 export default function Home() {
@@ -31,23 +25,23 @@ export default function Home() {
           <span><b>MIAMI SKATE</b><small>ACADEMY</small></span>
         </Link>
         <div className="desktop-nav">
-          <a href="#programs">Programs</a><a href="#families">For families</a><a href="#faq">FAQ</a>
+          <a href="#app">Progress</a><a href="#families">For families</a><a href="#faq">FAQ</a>
         </div>
         <div className="nav-actions">
           <InstallAppButton compact/><Link href="/auth/login" className="text-link">Sign in</Link>
-          <Link href="/auth/signup" className="button button-small">Enroll now <ArrowRight size={16}/></Link>
+          <Link href="/auth/signup" className="button button-small">Activate access <ArrowRight size={16}/></Link>
         </div>
         <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu" aria-expanded={menuOpen}>{menuOpen ? <X/> : <Menu/>}</button>
       </nav>
-      {menuOpen && <div className="mobile-menu"><a href="#programs" onClick={() => setMenuOpen(false)}>Programs</a><a href="#families" onClick={() => setMenuOpen(false)}>For families</a><a href="#faq" onClick={() => setMenuOpen(false)}>FAQ</a><Link href="/auth/login">Sign in</Link><Link href="/auth/signup" className="button">Enroll now</Link></div>}
+      {menuOpen && <div className="mobile-menu"><a href="#app" onClick={() => setMenuOpen(false)}>Progress</a><a href="#families" onClick={() => setMenuOpen(false)}>For families</a><a href="#faq" onClick={() => setMenuOpen(false)}>FAQ</a><Link href="/auth/login">Sign in</Link><Link href="/auth/signup" className="button">Activate access</Link></div>}
 
       <section className="hero">
         <div className="hero-copy">
-          <p className="eyebrow"><span/> Miami’s skateboarding home</p>
-          <h1>CONFIDENCE<br/>STARTS ON<br/><em>THE BOARD.</em></h1>
-          <p className="hero-lede">Safe, high-energy skateboarding instruction for kids—plus one simple app for parents to follow every win.</p>
+          <p className="eyebrow"><span/> Private member portal</p>
+          <h1>YOUR SKATE<br/>PROGRESS.<br/><em>ALL HERE.</em></h1>
+          <p className="hero-lede">A private home for enrolled MSA skaters and families to follow tricks, coach updates, milestones, and upcoming sessions.</p>
           <div className="hero-actions">
-            <Link href="/auth/signup" className="button">Enroll your skater <ArrowRight size={19}/></Link>
+            <Link href="/auth/login" className="button">Member sign in <ArrowRight size={19}/></Link>
             <InstallAppButton/>
           </div>
           <div className="trust-row"><div className="avatar-stack"><span>JT</span><span>MSA</span><span>YC</span></div><p><b>100+ Enrolled Members</b><small>Growing stronger, one session at a time</small></p></div>
@@ -69,14 +63,6 @@ export default function Home() {
         <div className="app-badge">INSTALL<br/>THE APP</div>
       </section>
 
-      <section className="section" id="programs">
-        <div className="section-heading"><div><p className="eyebrow"><span/> Find your fit</p><h2>A PROGRAM FOR<br/><em>EVERY SKATER.</em></h2></div><p>From the first push to the next big milestone, MSA creates the right mix of coaching, community, and challenge.</p></div>
-        <div className="program-grid">{programs.map((program, index) => <article className="program-card" key={program.title}>
-          <div className="program-image"><Image src={program.image} alt="" fill sizes="(max-width: 800px) 100vw, 33vw"/><span>0{index + 1}</span></div>
-          <div className="program-content"><small>{program.tag}</small><h3>{program.title}</h3><p>{program.copy}</p><Link href="/auth/signup">Choose this program <ArrowRight size={17}/></Link></div>
-        </article>)}</div>
-      </section>
-
       <section className="family-section" id="families">
         <div className="family-photo"><Image src="/images/msa-session.jpg" alt="An MSA coach celebrating with a young skater" fill sizes="(max-width: 900px) 100vw, 48vw"/><div className="photo-caption"><Sparkles/><span><b>Real progress.</b><small>Celebrated together.</small></span></div></div>
         <div className="family-copy"><p className="eyebrow"><span/> Built for busy families</p><h2>YOUR SKATER’S<br/>JOURNEY, <em>IN VIEW.</em></h2><p>The MSA Parent Portal keeps the details close and the progress clear, so you can spend less time chasing updates and more time cheering.</p>
@@ -87,7 +73,8 @@ export default function Home() {
 
       <section className="section faq-section" id="faq"><div><p className="eyebrow"><span/> Good to know</p><h2>PARENT<br/><em>QUESTIONS.</em></h2><p>Everything you need before the first session. Still wondering? Call or text <a href="tel:+17863947314">786-394-7314</a>.</p></div><div className="faq-list">{faqs.map(([q,a], index) => <button key={q} className="faq-item" onClick={() => setOpenFaq(openFaq === index ? null : index)} aria-expanded={openFaq === index}><span><b>{q}</b>{openFaq === index && <p>{a}</p>}</span><ChevronDown className={openFaq === index ? 'rotated' : ''}/></button>)}</div></section>
 
-      <section className="final-cta"><div><Users/><span><small>READY WHEN THEY ARE</small><h2>LET’S GET THEM ROLLING.</h2></span></div><Link href="/auth/signup" className="button button-light">Start enrollment <ArrowRight size={19}/></Link></section>
+      <section className="final-cta"><div><Users/><span><small>ALREADY PART OF THE CREW?</small><h2>OPEN YOUR SKATER PORTAL.</h2></span></div><Link href="/auth/login" className="button button-light">Member sign in <ArrowRight size={19}/></Link></section>
+      <section className="new-family-strip"><p><b>Not enrolled with MSA yet?</b> Enrollment happens outside this private member portal.</p><div><a href="https://miamiskateacademy.com" target="_blank" rel="noreferrer">Visit MiamiSkateAcademy.com</a><a href="sms:+17863947314">Text 786-394-7314</a></div></section>
       <footer><div className="brand-lockup"><span className="brand-mark">MSA</span><span><b>MIAMI SKATE</b><small>ACADEMY</small></span></div><p>Miami Skate Academy · Part of Yoint County</p><div><a href="tel:+17863947314">786-394-7314</a><a href="mailto:jt@yointcounty.com">jt@yointcounty.com</a></div></footer>
     </main>
   );

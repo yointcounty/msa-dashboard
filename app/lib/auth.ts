@@ -19,7 +19,7 @@ export async function createAccount(account: Omit<ParentAccount, 'passwordHash'>
 
 export async function signIn(email: string, password: string) {
   const raw = localStorage.getItem(ACCOUNT_KEY);
-  if (!raw) throw new Error('No parent account found on this device. Please enroll first.');
+  if (!raw) throw new Error('No portal account found on this device. Activate access first.');
   const account = JSON.parse(raw) as ParentAccount;
   if (account.email !== email.toLowerCase() || account.passwordHash !== await hashPassword(password)) throw new Error('That email or password does not match your account.');
   localStorage.setItem(SESSION_KEY, account.email);

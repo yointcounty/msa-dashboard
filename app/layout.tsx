@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Miami Skate Academy | Parent Portal & Enrollment",
-  description: "Skateboarding lessons, progress tracking, and family enrollment for Miami Skate Academy.",
+  title: "Miami Skate Academy | Private Skater Portal",
+  description: "Private trick progress, coach updates, milestones, and schedules for enrolled Miami Skate Academy families.",
   applicationName: "MSA Skater Portal",
   manifest: "/manifest.webmanifest",
   appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "MSA Portal" },

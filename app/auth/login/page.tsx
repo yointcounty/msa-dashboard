@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { signIn } from '../../lib/auth';
+import '../auth.css';
 
 export default function LoginPage() {
   const router = useRouter(); const [show, setShow] = useState(false); const [status, setStatus] = useState(''); const [busy, setBusy] = useState(false);
@@ -14,7 +15,8 @@ export default function LoginPage() {
     <section className="auth-panel"><Link href="/" className="brand-lockup"><span className="brand-mark">MSA</span><span><b>MIAMI SKATE</b><small>ACADEMY</small></span></Link><Link href="/" className="back-link"><ArrowLeft size={15}/> Home</Link>
       <div className="auth-card"><p className="eyebrow"><span/> Parent portal</p><h1>SIGN IN.</h1><p>Pick up right where your skater left off.</p>
         <form onSubmit={submit}><div className="field"><label htmlFor="email">Parent email</label><input id="email" name="email" type="email" autoComplete="email" required placeholder="you@example.com"/></div><div className="field"><div className="password-row"><label htmlFor="password">Password</label><button type="button" onClick={()=>setShow(!show)}>{show?'Hide':'Show'}</button></div><input id="password" name="password" type={show?'text':'password'} autoComplete="current-password" required minLength={8} placeholder="8+ characters"/></div>{status&&<div className="form-status error" role="alert">{status}</div>}<button className="button" disabled={busy}>{busy?'Signing in…':<>Sign in <ArrowRight size={18}/></>}</button></form>
-        <p className="auth-switch">New to MSA? <Link href="/auth/signup">Enroll your skater</Link></p>
+        <p className="auth-switch">Enrolled but new to the portal? <Link href="/auth/signup">Activate access</Link></p>
+        <div className="not-enrolled"><b>Not enrolled yet?</b><a href="https://miamiskateacademy.com" target="_blank" rel="noreferrer">Enroll at MiamiSkateAcademy.com</a><a href="sms:+17863947314">Text 786-394-7314</a></div>
       </div>
     </section>
   </main>;
