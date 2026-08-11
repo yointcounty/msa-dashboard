@@ -2,3 +2,11 @@
 .new-family-strip{margin:-30px 5vw 70px;padding:24px 28px;border:2px solid var(--ink);display:flex;align-items:center;justify-content:space-between;gap:25px;background:#fff}.new-family-strip p{margin:0}.new-family-strip>div{display:flex;gap:14px;flex-wrap:wrap}.new-family-strip a{font-size:12px;font-weight:900;text-transform:uppercase;text-decoration:underline}
 @media(max-width:900px){.app-preview-section{grid-template-columns:1fr}.phone-preview{margin:auto}.app-badge{display:none}.new-family-strip{align-items:flex-start;flex-direction:column}}
 @media(max-width:560px){.home-install-compact{display:none}.app-preview-section{padding:70px 6vw}.phone-preview{padding:15px;border-width:6px}.preview-trick{grid-template-columns:30px 1fr}.preview-status{grid-column:2;justify-self:start}.app-preview-copy h2{font-size:50px}}
+
+/* Compact member-home layout */
+.app-preview-section{padding:68px 7vw;gap:6vw}
+.new-family-strip{margin:-18px 5vw 46px}
+.coach-nav-link{font-size:12px;font-weight:900;text-transform:uppercase;color:#557700;border-bottom:2px solid var(--green);padding-bottom:3px}
+.final-links{display:flex;align-items:center;gap:22px}
+.coach-footer-link{font-size:12px;font-weight:900;text-transform:uppercase;text-decoration:underline}
+@media(max-width:900px){.final-links{align-items:stretch;flex-direction:column}.mobile-menu .coach-nav-link{align-self:flex-start}}

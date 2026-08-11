@@ -28,12 +28,12 @@ export default function Home() {
           <a href="#app">Progress</a><a href="#families">For families</a><a href="#faq">FAQ</a>
         </div>
         <div className="nav-actions">
-          <InstallAppButton compact/><Link href="/auth/login" className="text-link">Sign in</Link>
+          <InstallAppButton compact/><Link href="/coach" className="coach-nav-link">Coach sign in</Link><Link href="/auth/login" className="text-link">Member sign in</Link>
           <Link href="/auth/signup" className="button button-small">Activate access <ArrowRight size={16}/></Link>
         </div>
         <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu" aria-expanded={menuOpen}>{menuOpen ? <X/> : <Menu/>}</button>
       </nav>
-      {menuOpen && <div className="mobile-menu"><a href="#app" onClick={() => setMenuOpen(false)}>Progress</a><a href="#families" onClick={() => setMenuOpen(false)}>For families</a><a href="#faq" onClick={() => setMenuOpen(false)}>FAQ</a><Link href="/auth/login">Sign in</Link><Link href="/auth/signup" className="button">Activate access</Link></div>}
+      {menuOpen && <div className="mobile-menu"><a href="#app" onClick={() => setMenuOpen(false)}>Progress</a><a href="#families" onClick={() => setMenuOpen(false)}>For families</a><a href="#faq" onClick={() => setMenuOpen(false)}>FAQ</a><Link href="/coach" className="coach-nav-link">Coach sign in</Link><Link href="/auth/login">Member sign in</Link><Link href="/auth/signup" className="button">Activate access</Link></div>}
 
       <section className="hero">
         <div className="hero-copy">
@@ -73,7 +73,7 @@ export default function Home() {
 
       <section className="section faq-section" id="faq"><div><p className="eyebrow"><span/> Good to know</p><h2>PARENT<br/><em>QUESTIONS.</em></h2><p>Everything you need before the first session. Still wondering? Call or text <a href="tel:+17863947314">786-394-7314</a>.</p></div><div className="faq-list">{faqs.map(([q,a], index) => <button key={q} className="faq-item" onClick={() => setOpenFaq(openFaq === index ? null : index)} aria-expanded={openFaq === index}><span><b>{q}</b>{openFaq === index && <p>{a}</p>}</span><ChevronDown className={openFaq === index ? 'rotated' : ''}/></button>)}</div></section>
 
-      <section className="final-cta"><div><Users/><span><small>ALREADY PART OF THE CREW?</small><h2>OPEN YOUR SKATER PORTAL.</h2></span></div><Link href="/auth/login" className="button button-light">Member sign in <ArrowRight size={19}/></Link></section>
+      <section className="final-cta"><div><Users/><span><small>ALREADY PART OF THE CREW?</small><h2>OPEN YOUR SKATER PORTAL.</h2></span></div><div className="final-links"><Link href="/coach" className="coach-footer-link">Coach sign in</Link><Link href="/auth/login" className="button button-light">Member sign in <ArrowRight size={19}/></Link></div></section>
       <section className="new-family-strip"><p><b>Not enrolled with MSA yet?</b> Enrollment happens outside this private member portal.</p><div><a href="https://miamiskateacademy.com" target="_blank" rel="noreferrer">Visit MiamiSkateAcademy.com</a><a href="sms:+17863947314">Text 786-394-7314</a></div></section>
       <footer><div className="brand-lockup"><span className="brand-mark">MSA</span><span><b>MIAMI SKATE</b><small>ACADEMY</small></span></div><p>Miami Skate Academy · Part of Yoint County</p><div><a href="tel:+17863947314">786-394-7314</a><a href="mailto:jt@yointcounty.com">jt@yointcounty.com</a></div></footer>
     </main>
