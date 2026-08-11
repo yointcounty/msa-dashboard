@@ -1,116 +1,86 @@
-﻿'use client';
+'use client';
+
+import Image from 'next/image';
 import Link from 'next/link';
-import { Users, Zap, TrendingUp } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowRight, CalendarDays, ChevronDown, Menu, ShieldCheck, Sparkles, Trophy, Users, X } from 'lucide-react';
+
+const programs = [
+  { title: 'Private Lessons', copy: 'One-on-one coaching built around your skater’s pace, goals, and confidence.', tag: 'Most focused', image: '/images/msa-session.jpg' },
+  { title: 'Small Groups', copy: 'Learn with friends in coach-led groups capped at four skaters per coach.', tag: 'Build together', image: '/images/msa-lessons.jpg' },
+  { title: 'Travel Team & Camps', copy: 'More time on the board through weekend sessions and seasonal programs.', tag: 'Level up', image: '/images/msa-coaching.jpg' },
+];
+
+const faqs = [
+  ['Is MSA beginner-friendly?', 'Absolutely. Coaches meet each skater at their current level and focus first on safety, balance, board control, and confidence.'],
+  ['Where do lessons happen?', 'Lessons can take place at local skateparks, nearby public parks, or an appropriate home practice area across Miami, Hollywood, and nearby South Florida communities.'],
+  ['What can parents track?', 'The parent dashboard brings upcoming sessions, progress milestones, coach notes, and enrollment details into one easy place.'],
+];
 
 export default function Home() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900">
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
-        <div className="text-center mb-16">
-          <div className="mb-8">
-            <h1 className="text-6xl md:text-7xl font-black mb-4 neon-green">
-              MIAMI SKATE ACADEMY
-            </h1>
-            <h2 className="text-2xl md:text-3xl font-bold neon-cyan mb-4">
-              Part of Yoint County
-            </h2>
-            <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-              Learn to skate. Track progress. Build confidence. For kids and families.
-            </p>
+    <main className="site-shell">
+      <nav className="topbar" aria-label="Primary navigation">
+        <Link href="/" className="brand-lockup" aria-label="Miami Skate Academy home">
+          <span className="brand-mark">MSA</span>
+          <span><b>MIAMI SKATE</b><small>ACADEMY</small></span>
+        </Link>
+        <div className="desktop-nav">
+          <a href="#programs">Programs</a><a href="#families">For families</a><a href="#faq">FAQ</a>
+        </div>
+        <div className="nav-actions">
+          <Link href="/auth/login" className="text-link">Sign in</Link>
+          <Link href="/auth/signup" className="button button-small">Enroll now <ArrowRight size={16}/></Link>
+        </div>
+        <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu" aria-expanded={menuOpen}>{menuOpen ? <X/> : <Menu/>}</button>
+      </nav>
+      {menuOpen && <div className="mobile-menu"><a href="#programs" onClick={() => setMenuOpen(false)}>Programs</a><a href="#families" onClick={() => setMenuOpen(false)}>For families</a><a href="#faq" onClick={() => setMenuOpen(false)}>FAQ</a><Link href="/auth/login">Sign in</Link><Link href="/auth/signup" className="button">Enroll now</Link></div>}
+
+      <section className="hero">
+        <div className="hero-copy">
+          <p className="eyebrow"><span/> Miami’s skateboarding home</p>
+          <h1>CONFIDENCE<br/>STARTS ON<br/><em>THE BOARD.</em></h1>
+          <p className="hero-lede">Safe, high-energy skateboarding instruction for kids—plus one simple place for parents to follow every win.</p>
+          <div className="hero-actions">
+            <Link href="/auth/signup" className="button">Enroll your skater <ArrowRight size={19}/></Link>
+            <a href="#programs" className="button button-ghost">Explore programs</a>
           </div>
-          
-          <div className="flex gap-4 justify-center flex-wrap">
-            <Link 
-              href="/auth/login" 
-              className="px-8 py-4 bg-[#00ff41] text-black rounded-lg hover:shadow-[0_0_20px_#00ff41] font-bold text-lg uppercase tracking-wider transition-all duration-300 transform hover:translate-y-[-2px]"
-            >
-              Parent Portal
-            </Link>
-            <Link 
-              href="/auth/signup" 
-              className="px-8 py-4 border-2 border-[#00d4ff] text-[#00d4ff] rounded-lg hover:bg-[#00d4ff] hover:text-black hover:shadow-[0_0_20px_#00d4ff] font-bold text-lg uppercase tracking-wider transition-all duration-300 transform hover:translate-y-[-2px]"
-            >
-              Enroll Now
-            </Link>
-          </div>
+          <div className="trust-row"><div className="avatar-stack"><span>JT</span><span>MSA</span><span>YC</span></div><p><b>100+ Enrolled Members</b><small>Growing stronger, one session at a time</small></p></div>
         </div>
-
-        {/* Features */}
-        <div className="grid md:grid-cols-3 gap-8 mt-20">
-          {[
-            { 
-              icon: Users, 
-              title: 'Track Progress', 
-              desc: "Monitor your child's skateboarding journey from beginner to advanced.",
-              accent: '#00ff41'
-            },
-            { 
-              icon: Zap, 
-              title: 'Live Updates', 
-              desc: 'Real-time session notes, skill achievements, and coach feedback.',
-              accent: '#00d4ff'
-            },
-            { 
-              icon: TrendingUp, 
-              title: 'Growth Metrics', 
-              desc: 'Visual progress tracking and milestone celebrations.',
-              accent: '#ff0080'
-            },
-          ].map(({ icon: Icon, title, desc, accent }) => (
-            <div 
-              key={title} 
-              className="group bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-8 border border-gray-600 hover:border-[#00ff41] transition-all duration-300 hover:shadow-[0_0_30px_rgba(0,255,65,0.2)]"
-            >
-              <div 
-                className="w-12 h-12 rounded-lg mb-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
-                style={{ 
-                  background: `${accent}22`,
-                  color: accent
-                }}
-              >
-                <Icon className="w-8 h-8" />
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-2 group-hover:neon-green transition-all">
-                {title}
-              </h3>
-              <p className="text-gray-400 group-hover:text-gray-300">
-                {desc}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        {/* Stats */}
-        <div className="grid md:grid-cols-4 gap-8 mt-32 pt-20 border-t border-gray-700">
-          {[
-            { label: 'Active Students', value: '16+' },
-            { label: 'Skill Levels', value: '10+' },
-            { label: 'Locations', value: '3' },
-            { label: 'Sessions/Week', value: '20+' },
-          ].map(({ label, value }) => (
-            <div key={label} className="text-center">
-              <div className="text-5xl font-black neon-green mb-2">{value}</div>
-              <div className="text-gray-400 text-sm uppercase tracking-wider">{label}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* CTA */}
-        <div className="mt-20 text-center py-16 border-t border-gray-700">
-          <p className="text-gray-400 mb-4 text-sm">Powered by Yoint County Skateboarding</p>
-          <Link 
-            href="/auth/signup"
-            className="inline-block px-12 py-5 bg-gradient-to-r from-[#00ff41] to-[#00d4ff] text-black rounded-lg font-black text-xl uppercase tracking-widest hover:shadow-[0_0_40px_#00ff41] transition-all duration-300 transform hover:scale-105"
-          >
-            Start Learning ??
-          </Link>
+        <div className="hero-media">
+          <Image src="/images/msa-coaching.jpg" alt="Miami Skate Academy coaches and young skaters at the skatepark" fill priority sizes="(max-width: 900px) 100vw, 50vw"/>
+          <div className="hero-sticker"><Trophy size={24}/><b>SKATE.<br/>GROW.<br/>BELONG.</b></div>
+          <div className="session-card"><span className="pulse"/><div><small>NEXT UP</small><b>Weekend Team Session</b><span>Saturday · 10:00 AM</span></div><CalendarDays size={24}/></div>
         </div>
       </section>
 
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-20 left-1/4 w-96 h-96 bg-[#00ff41] opacity-5 blur-3xl rounded-full animate-pulse"></div>
-        <div className="absolute bottom-20 right-1/4 w-96 h-96 bg-[#00d4ff] opacity-5 blur-3xl rounded-full animate-pulse"></div>
-      </div>
-    </div>
+      <section className="proof-strip" aria-label="Academy highlights">
+        <div><strong>100+</strong><span>ENROLLED MEMBERS</span></div><div><strong>4:1</strong><span>GROUP COACH RATIO</span></div><div><strong>3</strong><span>SOUTH FLORIDA AREAS</span></div><div><strong>ALL</strong><span>SKILL LEVELS WELCOME</span></div>
+      </section>
+
+      <section className="section" id="programs">
+        <div className="section-heading"><div><p className="eyebrow"><span/> Find your fit</p><h2>A PROGRAM FOR<br/><em>EVERY SKATER.</em></h2></div><p>From the first push to the next big milestone, MSA creates the right mix of coaching, community, and challenge.</p></div>
+        <div className="program-grid">{programs.map((program, index) => <article className="program-card" key={program.title}>
+          <div className="program-image"><Image src={program.image} alt="" fill sizes="(max-width: 800px) 100vw, 33vw"/><span>0{index + 1}</span></div>
+          <div className="program-content"><small>{program.tag}</small><h3>{program.title}</h3><p>{program.copy}</p><Link href="/auth/signup">Choose this program <ArrowRight size={17}/></Link></div>
+        </article>)}</div>
+      </section>
+
+      <section className="family-section" id="families">
+        <div className="family-photo"><Image src="/images/msa-session.jpg" alt="An MSA coach celebrating with a young skater" fill sizes="(max-width: 900px) 100vw, 48vw"/><div className="photo-caption"><Sparkles/><span><b>Real progress.</b><small>Celebrated together.</small></span></div></div>
+        <div className="family-copy"><p className="eyebrow"><span/> Built for busy families</p><h2>YOUR SKATER’S<br/>JOURNEY, <em>IN VIEW.</em></h2><p>The MSA Parent Portal keeps the details close and the progress clear, so you can spend less time chasing updates and more time cheering.</p>
+          <ul><li><CalendarDays/><span><b>Session schedule</b><small>See what’s next and stay ready.</small></span></li><li><Trophy/><span><b>Progress milestones</b><small>Follow skills as they click.</small></span></li><li><ShieldCheck/><span><b>Coach updates</b><small>Stay connected after every session.</small></span></li></ul>
+          <Link href="/auth/login" className="button button-dark">Open parent portal <ArrowRight size={18}/></Link>
+        </div>
+      </section>
+
+      <section className="section faq-section" id="faq"><div><p className="eyebrow"><span/> Good to know</p><h2>PARENT<br/><em>QUESTIONS.</em></h2><p>Everything you need before the first session. Still wondering? Call or text <a href="tel:+17863947314">786-394-7314</a>.</p></div><div className="faq-list">{faqs.map(([q,a], index) => <button key={q} className="faq-item" onClick={() => setOpenFaq(openFaq === index ? null : index)} aria-expanded={openFaq === index}><span><b>{q}</b>{openFaq === index && <p>{a}</p>}</span><ChevronDown className={openFaq === index ? 'rotated' : ''}/></button>)}</div></section>
+
+      <section className="final-cta"><div><Users/><span><small>READY WHEN THEY ARE</small><h2>LET’S GET THEM ROLLING.</h2></span></div><Link href="/auth/signup" className="button button-light">Start enrollment <ArrowRight size={19}/></Link></section>
+      <footer><div className="brand-lockup"><span className="brand-mark">MSA</span><span><b>MIAMI SKATE</b><small>ACADEMY</small></span></div><p>Miami Skate Academy · Part of Yoint County</p><div><a href="tel:+17863947314">786-394-7314</a><a href="mailto:jt@yointcounty.com">jt@yointcounty.com</a></div></footer>
+    </main>
   );
 }
