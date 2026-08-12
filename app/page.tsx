@@ -193,7 +193,7 @@ export default function Home() {
             <div>
               <small>NEXT UP</small>
               <b>Weekend Team Session</b>
-              <span>Saturday · 10:00 AM</span>
+              <span>Saturday &amp; Sunday · 9:00 AM</span>
             </div>
             <CalendarDays size={24} />
           </div>

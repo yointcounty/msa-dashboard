@@ -1019,12 +1019,14 @@ footer > div:last-child {
 }
 .mobile-menu {
   display: flex;
-  position: absolute;
+  position: fixed;
   z-index: 20;
-  top: calc(100% + 10px);
+  top: 92px;
   right: 5vw;
   left: auto;
   min-width: 260px;
+  max-height: calc(100vh - 108px);
+  overflow-y: auto;
   background: var(--paper);
   padding: 22px;
   flex-direction: column;
@@ -1058,6 +1060,20 @@ footer > div:last-child {
 .hero-media:after {
   background: linear-gradient(180deg, transparent 62%, rgba(0, 0, 0, 0.28));
 }
+.hero h1,
+.hero h2,
+.hero h3,
+.programs-intro h2,
+.app-preview-copy h2,
+.family-copy h2,
+.faq-section h2,
+.final-cta h2 {
+  line-height: 0.96;
+}
+.session-card b,
+.session-card span {
+  line-height: 1.25;
+}
 .home-button {
   display: inline-flex;
   align-items: center;
@@ -1076,7 +1092,7 @@ footer > div:last-child {
     display: none;
   }
   .mobile-menu {
-    top: calc(100% + 6px);
+    top: 78px;
     right: 5vw;
     left: 5vw;
     min-width: 0;
