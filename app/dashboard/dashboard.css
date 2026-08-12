@@ -26,6 +26,14 @@
 .coach-lock { display:flex; align-items:center; gap:7px; font-size:11px; color:#667069; margin:13px 0 0; overflow-wrap:anywhere; }
 .muted { color:#5e675f; }
 .notification-card { grid-column:1/-1; }
+.profile-focus { display:grid; gap:4px; margin-top:18px; padding:12px; background:#f4f7ed; border-left:4px solid #6d9509; }
+.profile-focus small,.summary-metrics span { font-size:9px; font-weight:900; letter-spacing:1.5px; color:#5f8105; }
+.progress-summary { background:#f9fbf5; }
+.summary-metrics { display:flex; gap:28px; margin:18px 0 12px; }
+.summary-metrics>div { display:grid; gap:4px; }
+.summary-metrics b { font-size:30px; line-height:1; }
+.summary-bar { height:12px; background:#e0e5dc; border:1px solid #c8d0c4; overflow:hidden; }
+.summary-bar span { display:block; height:100%; background:var(--green); }
 .notification-list { display:grid; gap:0; }
 .notification-row { display:flex; gap:12px; padding:15px 0; border-bottom:1px solid #e2e5e0; }
 .notification-row>span { width:9px; height:9px; border-radius:50%; background:#bac1ba; margin-top:5px; }

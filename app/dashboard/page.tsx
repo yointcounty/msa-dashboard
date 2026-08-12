@@ -9,9 +9,9 @@ import { supabase } from '../lib/supabase';
 import './dashboard.css';
 
 type InstallPromptEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }> };
-
 type ProgressItem = { trick_id: string; status: string; progress: number; coach_note: string; tricks: { name: string; sort_order: number } | null };
 type Notice = { id: string; message: string; created_at: string; is_read: boolean };
+type CoachNote = { id: string; body: string; created_at: string };
 const labelStatus = (value: string) => value.replaceAll('_', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
 
 export default function Dashboard() {
@@ -19,6 +19,7 @@ export default function Dashboard() {
   const [account, setAccount] = useState<ParentAccount | null>(null);
   const [trickProgress, setTrickProgress] = useState<ProgressItem[]>([]);
   const [notifications, setNotifications] = useState<Notice[]>([]);
+  const [coachNote, setCoachNote] = useState<CoachNote | null>(null);
   const [toast, setToast] = useState('');
   const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent | null>(null);
   const [showInstallHelp, setShowInstallHelp] = useState(false);
@@ -31,17 +32,18 @@ export default function Dashboard() {
       if (!current) { router.replace('/auth/login'); return; }
       if (!active) return;
       setAccount(current);
-      const [{ data: progress }, { data: notices }] = await Promise.all([
+      const [{ data: progress }, { data: notices }, { data: latestNote }] = await Promise.all([
         supabase.from('skater_tricks').select('trick_id, status, progress, coach_note, tricks(name, sort_order)').eq('skater_id', current.skaterId),
         supabase.from('notifications').select('id, message, created_at, is_read').order('created_at', { ascending: false }).limit(6),
+        supabase.from('skater_notes').select('id, body, created_at').eq('skater_id', current.skaterId).order('created_at', { ascending: false }).limit(1).maybeSingle(),
       ]);
-      if (active) {
-        setTrickProgress(((progress || []) as unknown as ProgressItem[]).sort((a,b)=>(a.tricks?.sort_order || 0)-(b.tricks?.sort_order || 0)));
-        setNotifications((notices || []) as Notice[]);
-      }
+      if (!active) return;
+      setTrickProgress(((progress || []) as unknown as ProgressItem[]).sort((a, b) => (a.tricks?.sort_order || 0) - (b.tricks?.sort_order || 0)));
+      setNotifications((notices || []) as Notice[]);
+      setCoachNote((latestNote || null) as CoachNote | null);
     }
-    load();
-    const channel = supabase.channel('family-dashboard').on('postgres_changes', { event: '*', schema: 'public', table: 'skater_tricks' }, load).on('postgres_changes', { event: '*', schema: 'public', table: 'notifications' }, load).subscribe();
+    void load();
+    const channel = supabase.channel('family-dashboard').on('postgres_changes', { event: '*', schema: 'public', table: 'skater_tricks' }, load).on('postgres_changes', { event: '*', schema: 'public', table: 'skater_notes' }, load).on('postgres_changes', { event: '*', schema: 'public', table: 'notifications' }, load).subscribe();
     const capturePrompt = (event: Event) => { event.preventDefault(); setInstallPrompt(event as InstallPromptEvent); };
     window.addEventListener('beforeinstallprompt', capturePrompt);
     return () => { active = false; window.removeEventListener('beforeinstallprompt', capturePrompt); supabase.removeChannel(channel); };
@@ -56,23 +58,27 @@ export default function Dashboard() {
     setInstallPrompt(null);
   }
   if (!account) return null;
-  const checklistCoachNote = trickProgress.find((item) => item.coach_note.trim())?.coach_note.trim()
-    || 'Your coach will add one overall checklist note after the next session.';
+
+  const completedSkills = trickProgress.filter((item) => item.status === 'mastered' || item.progress >= 100).length;
+  const overallProgress = trickProgress.length ? Math.round(trickProgress.reduce((sum, item) => sum + item.progress, 0) / trickProgress.length) : 0;
+  const currentFocus = trickProgress.find((item) => item.status !== 'mastered' && item.progress < 100)?.tricks?.name || 'Keep rolling and building consistency';
+  const checklistCoachNote = coachNote?.body || 'Your coach will add one overall checklist note after the next session.';
 
   return <main className="dashboard">
-    <nav className="dash-nav"><Link href="/" className="brand-lockup"><span className="brand-mark">MSA</span><span><b>MIAMI SKATE</b><small>SKATER PORTAL</small></span></Link><div className="dash-user"><button className="install-nav-button" onClick={installApp}><Download size={16}/> Install app</button><span>{account.parentName}</span><button onClick={async () => { await signOut(); router.push('/'); }}>Sign out</button></div></nav>
+    <nav className="dash-nav"><Link href="/" className="brand-lockup"><span className="brand-mark">MSA</span><span><b>MIAMI SKATE</b><small>SKATER PORTAL</small></span></Link><div className="dash-user"><button className="install-nav-button" onClick={installApp}><Download size={16} /> Install app</button><span>{account.parentName}</span><button onClick={async () => { await signOut(); router.push('/'); }}>Sign out</button></div></nav>
     <div className="dash-main">
-      <header className="dash-greeting"><div><p className="eyebrow"><span/> Family dashboard</p><h1>HEY, {account.parentName.split(' ')[0]}!</h1><p>Here&apos;s what&apos;s happening with {account.childName} at MSA.</p></div><a className="button button-small" href={`sms:+17863947314?body=${encodeURIComponent(`Hi JT, I'd like to book a skate session for ${account.childName}.`)}`}>Book a session</a></header>
-      <section className="install-app-card"><div className="install-app-icon"><Smartphone/></div><div><small>NEW</small><b>Take the MSA portal with you</b><span>Install it on your home screen for quick access to every update.</span></div><button className="button button-small" onClick={installApp}><Download size={17}/> Install</button></section>
+      <header className="dash-greeting"><div><p className="eyebrow"><span /> Family dashboard</p><h1>HEY, {account.parentName.split(' ')[0]}!</h1><p>Here&apos;s what&apos;s happening with {account.childName} at MSA.</p></div><a className="button button-small" href={'sms:+17863947314?body=' + encodeURIComponent('Hi JT, I would like to book a skate session for ' + account.childName + '.')}>Book a session</a></header>
+      <section className="install-app-card"><div className="install-app-icon"><Smartphone /></div><div><small>NEW</small><b>Take the MSA portal with you</b><span>Install it on your home screen for quick access to every update.</span></div><button className="button button-small" onClick={installApp}><Download size={17} /> Install</button></section>
       <section className="dashboard-grid">
-        <div className="dash-card next-session"><h2>Next session</h2><div className="session-info"><div><div className="session-date">SAT 15</div><p>10:00 AM · Kendall Skatepark</p><b>MSA Member Session</b></div><CheckCircle2 size={48}/></div></div>
-        <div className="dash-card"><h2>Skater profile</h2><p><b>{account.childName}</b></p><p className="muted">Active MSA member · All set</p></div>
-        <div className="dash-card trick-card"><div className="card-heading-row"><div><small>LIVE SKATER ROADMAP</small><h2>Main trick checklist</h2></div><Trophy/></div><div className="trick-list">{trickProgress.map((item) => { const level=labelStatus(item.status); return <div className="trick-row" key={item.trick_id}><span className={`trick-check ${item.status === 'mastered' ? 'done' : ''}`}>{item.status === 'mastered' && <Check size={15}/>}</span><div className="trick-details"><div><b>{item.tricks?.name}</b><span className={`status-pill status-${item.status.replace('_', '-')}`}>{level}</span></div><div className="progress-bar"><span style={{ width: `${item.progress}%` }}/></div></div></div>})}</div><div className="checklist-coach-note"><MessageCircle size={18}/><div><small>COACH NOTE</small><p>{checklistCoachNote}</p></div></div><p className="coach-lock"><LockKeyhole size={15}/> Progress is updated live by your MSA coach after sessions.</p></div>
-        <div className="dash-card notification-card"><div className="card-heading-row"><div><small>COACH UPDATES</small><h2>Notifications</h2></div><Bell/></div>{notifications.length ? <div className="notification-list">{notifications.map((notice)=><div className={`notification-row ${notice.is_read ? '' : 'unread'}`} key={notice.id}><span/><div><b>{notice.message}</b><small>{new Date(notice.created_at).toLocaleDateString()}</small></div></div>)}</div> : <p className="muted">New coach updates will appear here automatically.</p>}</div>
-        <div className="dash-card"><h2>Quick actions</h2><div className="quick-actions"><button onClick={() => notify('Coach message request noted.')}><MessageCircle size={20}/> Message coach</button><button onClick={() => notify('Calendar reminder added.')}><CalendarPlus size={20}/> Add reminder</button><button onClick={() => notify('All recent milestones are up to date.')}><CheckCircle2 size={20}/> View milestones</button><button onClick={() => window.open('https://www.yointcounty.com/collections/skate-lessons', '_blank')}><ShoppingBag size={20}/> MSA gear</button></div></div>
+        <div className="dash-card next-session"><h2>Next session</h2><div className="session-info"><div><div className="session-date">SAT 15</div><p>10:00 AM · Kendall Skatepark</p><b>MSA Member Session</b></div><CheckCircle2 size={48} /></div></div>
+        <div className="dash-card"><h2>Skater profile</h2><p><b>{account.childName}</b></p><p className="muted">Active MSA member · All set</p><div className="profile-focus"><small>CURRENT FOCUS</small><b>{currentFocus}</b></div></div>
+        <div className="dash-card progress-summary"><div className="card-heading-row"><div><small>MSA PROGRESSION</small><h2>Your path</h2></div><Trophy /></div><div className="summary-metrics"><div><b>{overallProgress}%</b><span>overall progress</span></div><div><b>{completedSkills}/{trickProgress.length || 0}</b><span>skills mastered</span></div></div><div className="summary-bar"><span style={{ width: overallProgress + '%' }} /></div><p className="muted">Your coach updates this roadmap after each session.</p></div>
+        <div className="dash-card trick-card"><div className="card-heading-row"><div><small>LIVE SKATER ROADMAP</small><h2>Main trick checklist</h2></div><Trophy /></div><div className="trick-list">{trickProgress.map((item) => { const level = labelStatus(item.status); return <div className="trick-row" key={item.trick_id}><span className={'trick-check ' + (item.status === 'mastered' ? 'done' : '')}>{item.status === 'mastered' && <Check size={15} />}</span><div className="trick-details"><div><b>{item.tricks?.name}</b><span className={'status-pill status-' + item.status.replace('_', '-')}>{level}</span></div><div className="progress-bar"><span style={{ width: item.progress + '%' }} /></div></div></div>; })}</div><div className="checklist-coach-note"><MessageCircle size={18} /><div><small>COACH NOTE{coachNote ? ' · ' + new Date(coachNote.created_at).toLocaleDateString() : ''}</small><p>{checklistCoachNote}</p></div></div><p className="coach-lock"><LockKeyhole size={15} /> Progress is updated live by your MSA coach after sessions.</p></div>
+        <div className="dash-card notification-card"><div className="card-heading-row"><div><small>COACH UPDATES</small><h2>Notifications</h2></div><Bell /></div>{notifications.length ? <div className="notification-list">{notifications.map((notice) => <div className={'notification-row ' + (notice.is_read ? '' : 'unread')} key={notice.id}><span /><div><b>{notice.message}</b><small>{new Date(notice.created_at).toLocaleDateString()}</small></div></div>)}</div> : <p className="muted">New coach updates will appear here automatically.</p>}</div>
+        <div className="dash-card"><h2>Quick actions</h2><div className="quick-actions"><button onClick={() => notify('Coach message request noted.')}><MessageCircle size={20} /> Message coach</button><button onClick={() => notify('Calendar reminder added.')}><CalendarPlus size={20} /> Add reminder</button><button onClick={() => notify('All recent milestones are up to date.')}><CheckCircle2 size={20} /> View milestones</button><button onClick={() => window.open('https://www.yointcounty.com/collections/skate-lessons', '_blank')}><ShoppingBag size={20} /> MSA gear</button></div></div>
       </section>
     </div>
-    {showInstallHelp && <div className="modal-backdrop" role="presentation" onClick={() => setShowInstallHelp(false)}><section className="install-modal" role="dialog" aria-modal="true" aria-labelledby="install-title" onClick={(event) => event.stopPropagation()}><button className="modal-close" aria-label="Close install instructions" onClick={() => setShowInstallHelp(false)}><X/></button><div className="install-app-icon"><Smartphone/></div><p className="eyebrow"><span/> Install MSA</p><h2 id="install-title">ADD IT TO YOUR HOME SCREEN.</h2>{isIos ? <ol><li>Tap the <b>Share</b> button <Share2 size={17}/>.</li><li>Scroll and choose <b>Add to Home Screen</b>.</li><li>Tap <b>Add</b>.</li></ol> : <ol><li>Open your browser menu.</li><li>Choose <b>Install app</b> or <b>Add to Home screen</b>.</li><li>Confirm <b>Install</b>.</li></ol>}<p className="muted">The MSA icon will appear with your other apps and open directly to the portal.</p></section></div>}
+    {showInstallHelp && <div className="modal-backdrop" role="presentation" onClick={() => setShowInstallHelp(false)}><section className="install-modal" role="dialog" aria-modal="true" aria-labelledby="install-title" onClick={(event) => event.stopPropagation()}><button className="modal-close" aria-label="Close install instructions" onClick={() => setShowInstallHelp(false)}><X /></button><div className="install-app-icon"><Smartphone /></div><p className="eyebrow"><span /> Install MSA</p><h2 id="install-title">ADD IT TO YOUR HOME SCREEN.</h2>{isIos ? <ol><li>Tap the <b>Share</b> button <Share2 size={17} />.</li><li>Scroll and choose <b>Add to Home Screen</b>.</li><li>Tap <b>Add</b>.</li></ol> : <ol><li>Open your browser menu.</li><li>Choose <b>Install app</b> or <b>Add to Home screen</b>.</li><li>Confirm <b>Install</b>.</li></ol>}<p className="muted">The MSA icon will appear with your other apps and open directly to the portal.</p></section></div>}
     {toast && <div className="toast" role="status">{toast}</div>}
   </main>;
 }
