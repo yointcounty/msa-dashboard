@@ -34,6 +34,18 @@ create policy "next_session_select_family_or_coach" on public.skater_next_sessio
 create policy "next_session_insert_coach" on public.skater_next_sessions for insert to authenticated with check ((select private.is_coach()) and exists (select 1 from public.skaters s where s.id = skater_next_sessions.skater_id));
 create policy "next_session_update_coach" on public.skater_next_sessions for update to authenticated using ((select private.is_coach())) with check ((select private.is_coach()) and exists (select 1 from public.skaters s where s.id = skater_next_sessions.skater_id));
 create policy "next_session_delete_coach" on public.skater_next_sessions for delete to authenticated using ((select private.is_coach()));
+create index if not exists skater_next_sessions_updated_by_idx on public.skater_next_sessions(updated_by);
+
+insert into public.tricks (name, sort_order, category) values
+  ('Step Off Safely', 75, 'super_beginner'),
+  ('Two-Foot Landing', 76, 'super_beginner'),
+  ('Flip Board & Land', 77, 'super_beginner'),
+  ('Jump On Board (Small Surface)', 78, 'super_beginner')
+on conflict (name) do nothing;
+insert into public.skater_tricks (skater_id, trick_id)
+select s.id, t.id from public.skaters s cross join public.tricks t
+where s.active = true and t.name in ('Step Off Safely', 'Two-Foot Landing', 'Flip Board & Land', 'Jump On Board (Small Surface)')
+on conflict (skater_id, trick_id) do nothing;
 alter table public.media enable row level security;
 grant select, insert, update, delete on public.media to authenticated;
 create index if not exists media_skater_id_idx on public.media(skater_id);

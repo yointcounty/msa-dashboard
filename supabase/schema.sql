@@ -76,5 +76,13 @@ create table if not exists public.skater_next_sessions (
   updated_by uuid references public.profiles(id) on delete set null,
   updated_at timestamptz not null default now()
 );
+create index if not exists skater_next_sessions_updated_by_idx on public.skater_next_sessions(updated_by);
+
+insert into public.tricks (name, sort_order, category) values
+  ('Step Off Safely', 75, 'super_beginner'),
+  ('Two-Foot Landing', 76, 'super_beginner'),
+  ('Flip Board & Land', 77, 'super_beginner'),
+  ('Jump On Board (Small Surface)', 78, 'super_beginner')
+on conflict (name) do nothing;
 
 insert into storage.buckets (id, name, public) values ('skater-media', 'skater-media', false) on conflict (id) do nothing;
