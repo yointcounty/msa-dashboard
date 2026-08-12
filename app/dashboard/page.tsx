@@ -62,6 +62,53 @@ export default function Dashboard() {
     setInstallPrompt(null);
   }
   if (!account) return null;
+  const childName = account.childName;
+
+  function messageCoach() {
+    const body = encodeURIComponent(`Hi JT, I have a question about ${childName}'s MSA progress.`);
+    window.location.href = `sms:+17863947314?body=${body}`;
+  }
+
+  function addReminder() {
+    if (!nextSession) {
+      notify('Your coach has not scheduled the next session yet.');
+      return;
+    }
+    const start = new Date(`${nextSession.session_date}T${nextSession.start_time}`);
+    const end = new Date(start.getTime() + 60 * 60 * 1000);
+    const pad = (value: number) => String(value).padStart(2, '0');
+    const toIcsLocal = (date: Date) => `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}T${pad(date.getHours())}${pad(date.getMinutes())}00`;
+    const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
+    const ics = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Miami Skate Academy//Skater Portal//EN',
+      'BEGIN:VEVENT',
+      `UID:msa-${nextSession.skater_id}-${nextSession.session_date}-${nextSession.start_time}@miamiskateacademy.com`,
+      `DTSTAMP:${stamp}`,
+      `DTSTART:${toIcsLocal(start)}`,
+      `DTEND:${toIcsLocal(end)}`,
+      `SUMMARY:${nextSession.title}`,
+      `LOCATION:${nextSession.location}`,
+      `DESCRIPTION:Miami Skate Academy session for ${childName}.`,
+      'END:VEVENT',
+      'END:VCALENDAR',
+    ].join('\r\n');
+    const url = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `msa-${nextSession.session_date}-session.ics`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    notify('Calendar reminder downloaded.');
+  }
+
+  function viewMilestones() {
+    document.getElementById('milestones')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    notify('Showing your live milestones.');
+  }
 
   const completedSkills = trickProgress.filter((item) => item.status === 'mastered' || item.progress >= 100).length;
   const overallProgress = trickProgress.length ? Math.round(trickProgress.reduce((sum, item) => sum + item.progress, 0) / trickProgress.length) : 0;
@@ -81,10 +128,10 @@ export default function Dashboard() {
         <div className="dash-card live-next-session"><h2>Next session</h2>{nextSession ? <div className="session-info"><div><div className="session-date">{sessionDay} {sessionDateLabel}</div><p>{sessionTime} · {nextSession.location}</p><b>{nextSession.title}</b></div><CheckCircle2 size={48} /></div> : <div className="session-empty"><p>Your coach has not scheduled the next session yet.</p><span>Check back here for the date, time, and location.</span></div>}</div>
         <div className="dash-card next-session"><h2>Next session</h2><div className="session-info"><div><div className="session-date">SAT 15</div><p>10:00 AM · Kendall Skatepark</p><b>MSA Member Session</b></div><CheckCircle2 size={48} /></div></div>
         <div className="dash-card"><h2>Skater profile</h2><p><b>{account.childName}</b></p><p className="muted">Active MSA member · All set</p><div className="profile-focus"><small>CURRENT FOCUS</small><b>{currentFocus}</b></div></div>
-        <div className="dash-card progress-summary"><div className="card-heading-row"><div><small>MSA PROGRESSION</small><h2>Your path</h2></div><Trophy /></div><div className="summary-metrics"><div><b>{overallProgress}%</b><span>overall progress</span></div><div><b>{completedSkills}/{trickProgress.length || 0}</b><span>skills mastered</span></div></div><div className="summary-bar"><span style={{ width: overallProgress + '%' }} /></div><p className="muted">Your coach updates this roadmap after each session.</p></div>
+        <div id="milestones" className="dash-card progress-summary"><div className="card-heading-row"><div><small>MSA PROGRESSION</small><h2>Your path</h2></div><Trophy /></div><div className="summary-metrics"><div><b>{overallProgress}%</b><span>overall progress</span></div><div><b>{completedSkills}/{trickProgress.length || 0}</b><span>skills mastered</span></div></div><div className="summary-bar"><span style={{ width: overallProgress + '%' }} /></div><p className="muted">Your coach updates this roadmap after each session.</p></div>
         <div className="dash-card trick-card"><div className="card-heading-row"><div><small>LIVE SKATER ROADMAP</small><h2>Main trick checklist</h2></div><Trophy /></div><div className="trick-list">{trickProgress.map((item) => { const level = labelStatus(item.status); return <div className="trick-row" key={item.trick_id}><span className={'trick-check ' + (item.status === 'mastered' ? 'done' : '')}>{item.status === 'mastered' && <Check size={15} />}</span><div className="trick-details"><div><b>{item.tricks?.name}</b><span className={'status-pill status-' + item.status.replace('_', '-')}>{level}</span></div><div className="progress-bar"><span style={{ width: item.progress + '%' }} /></div></div></div>; })}</div><div className="checklist-coach-note"><MessageCircle size={18} /><div><small>COACH NOTE{coachNote ? ' · ' + new Date(coachNote.created_at).toLocaleDateString() : ''}</small><p>{checklistCoachNote}</p></div></div><p className="coach-lock"><LockKeyhole size={15} /> Progress is updated live by your MSA coach after sessions.</p></div>
         <div className="dash-card notification-card"><div className="card-heading-row"><div><small>COACH UPDATES</small><h2>Notifications</h2></div><Bell /></div>{notifications.length ? <div className="notification-list">{notifications.map((notice) => <div className={'notification-row ' + (notice.is_read ? '' : 'unread')} key={notice.id}><span /><div><b>{notice.message}</b><small>{new Date(notice.created_at).toLocaleDateString()}</small></div></div>)}</div> : <p className="muted">New coach updates will appear here automatically.</p>}</div>
-        <div className="dash-card"><h2>Quick actions</h2><div className="quick-actions"><button onClick={() => notify('Coach message request noted.')}><MessageCircle size={20} /> Message coach</button><button onClick={() => notify('Calendar reminder added.')}><CalendarPlus size={20} /> Add reminder</button><button onClick={() => notify('All recent milestones are up to date.')}><CheckCircle2 size={20} /> View milestones</button><button onClick={() => window.open('https://www.yointcounty.com/collections/skate-lessons', '_blank')}><ShoppingBag size={20} /> MSA gear</button></div></div>
+        <div className="dash-card"><h2>Quick actions</h2><div className="quick-actions"><button onClick={messageCoach}><MessageCircle size={20} /> Message coach</button><button onClick={addReminder}><CalendarPlus size={20} /> Add reminder</button><button onClick={viewMilestones}><CheckCircle2 size={20} /> View milestones</button><button onClick={() => window.open('https://www.yointcounty.com/collections/skate-lessons', '_blank')}><ShoppingBag size={20} /> MSA gear</button></div></div>
       </section>
     </div>
     {showInstallHelp && <div className="modal-backdrop" role="presentation" onClick={() => setShowInstallHelp(false)}><section className="install-modal" role="dialog" aria-modal="true" aria-labelledby="install-title" onClick={(event) => event.stopPropagation()}><button className="modal-close" aria-label="Close install instructions" onClick={() => setShowInstallHelp(false)}><X /></button><div className="install-app-icon"><Smartphone /></div><p className="eyebrow"><span /> Install MSA</p><h2 id="install-title">ADD IT TO YOUR HOME SCREEN.</h2>{isIos ? <ol><li>Tap the <b>Share</b> button <Share2 size={17} />.</li><li>Scroll and choose <b>Add to Home Screen</b>.</li><li>Tap <b>Add</b>.</li></ol> : <ol><li>Open your browser menu.</li><li>Choose <b>Install app</b> or <b>Add to Home screen</b>.</li><li>Confirm <b>Install</b>.</li></ol>}<p className="muted">The MSA icon will appear with your other apps and open directly to the portal.</p></section></div>}
