@@ -12,8 +12,28 @@
   color: #fff;
 }
 .coach-auth > section {
+  position: relative;
   padding: 12vh 8vw;
   background: linear-gradient(145deg, #111c17, #24342b);
+}
+.coach-home-button {
+  position: absolute;
+  top: 30px;
+  right: 8vw;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 15px;
+  color: var(--ink);
+  background: var(--green);
+  border: 2px solid var(--ink);
+  box-shadow: 3px 3px 0 #000;
+  font-size: 13px;
+  font-weight: 900;
+}
+.coach-home-button:hover {
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0 #000;
 }
 .coach-auth h1,
 .coach-main h1 {
@@ -249,6 +269,10 @@
   }
   .coach-auth > section {
     padding: 55px 7vw;
+  }
+  .coach-home-button {
+    top: 24px;
+    right: 7vw;
   }
   .coach-auth > form {
     margin: 30px 7vw;

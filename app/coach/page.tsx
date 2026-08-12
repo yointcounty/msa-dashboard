@@ -6,6 +6,7 @@ import {
   CalendarDays,
   CheckCircle2,
   ClipboardCheck,
+  ArrowLeft,
   ImagePlus,
   LogOut,
   Save,
@@ -773,6 +774,9 @@ export default function CoachPortal() {
               <small>COACH PORTAL</small>
             </span>
           </Link>
+          <Link href="/" className="coach-home-button">
+            <ArrowLeft size={16} /> Home
+          </Link>
           <p className="eyebrow">
             <span /> Private staff access
           </p>
@@ -883,8 +887,10 @@ export default function CoachPortal() {
             </p>
             <h2>Family accounts</h2>
             <p>
-              Every family profile stays saved until intentionally deleted. Link
-              or correct a skater here if signup was incomplete.
+              Profiles, progress, notes, media, and schedules stay saved in
+              Supabase through future website updates. Family data is removed
+              only by an intentional account deletion; coach profiles are
+              protected.
             </p>
           </div>
           <div className="family-account-list">
