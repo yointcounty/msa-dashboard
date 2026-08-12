@@ -1,65 +1,401 @@
-.install-nav-button { display:flex!important; align-items:center; gap:6px; border-color:var(--green)!important; color:var(--green)!important; }
-.install-app-card { display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:18px; background:#fff; border:2px solid var(--ink); box-shadow:5px 5px 0 var(--green); padding:18px 22px; margin-bottom:24px; }
-.install-app-icon { width:49px; height:49px; border-radius:50%; background:var(--green); display:grid; place-items:center; border:2px solid var(--ink); }
-.install-app-card>div:nth-child(2) { display:flex; flex-direction:column; gap:3px; }
-.install-app-card small,.card-heading-row small { font-size:9px; font-weight:900; letter-spacing:2px; color:#5f8105; }
-.install-app-card span { font-size:13px; color:#5c655e; }
-.trick-card { grid-column:1/-1; }
-.card-heading-row { display:flex; justify-content:space-between; align-items:flex-start; gap:14px; border-bottom:1px solid #d9ded8; padding-bottom:14px; }
-.card-heading-row h2 { margin:5px 0 0; }
-.card-heading-row>svg { color:#6d9509; width:35px; height:35px; }
-.trick-list { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); column-gap:28px; min-width:0; }
-.trick-row { display:flex; gap:11px; padding:14px 0; border-bottom:1px solid #e2e5e0; min-width:0; }
-.trick-check { width:25px; height:25px; flex:0 0 25px; border:2px solid #a9b1aa; border-radius:50%; display:grid; place-items:center; }
-.trick-check.done { background:var(--green); border-color:var(--ink); }
-.trick-details { flex:1; min-width:0; }
-.trick-details>div:first-child { display:flex; align-items:center; justify-content:space-between; gap:10px; min-width:0; }
-.trick-details b { min-width:0; overflow-wrap:anywhere; }
-.trick-details .progress-bar { margin-top:8px; }
-.status-pill { flex:0 0 auto; white-space:nowrap; font-size:8px; text-transform:uppercase; letter-spacing:.65px; font-weight:900; border-radius:20px; padding:4px 7px; background:#ecefea; }
-.status-learning { background:#fff2b9; }.status-consistent { background:#dff6bd; }.status-mastered { background:var(--green); }
-.checklist-coach-note { display:flex; align-items:flex-start; gap:10px; min-width:0; margin-top:16px; padding:13px 15px; background:#f4f7ed; border-left:4px solid #6d9509; }
-.checklist-coach-note>svg { flex:0 0 auto; color:#6d9509; }
-.checklist-coach-note>div { min-width:0; }
-.checklist-coach-note small { font-size:9px; font-weight:900; letter-spacing:1.5px; color:#5f8105; }
-.checklist-coach-note p { margin:4px 0 0; font-size:13px; line-height:1.45; overflow-wrap:anywhere; }
-.coach-lock { display:flex; align-items:center; gap:7px; font-size:11px; color:#667069; margin:13px 0 0; overflow-wrap:anywhere; }
-.muted { color:#5e675f; }
-.notification-card { grid-column:1/-1; }
-.dashboard-grid > .next-session { display:none; }
-.live-next-session { border-top:4px solid var(--green); }
-.session-empty { display:grid; gap:5px; padding:14px 0 4px; }
-.session-empty p { margin:0; font-weight:900; }
-.session-empty span { color:#667069; font-size:12px; }
-.profile-focus { display:grid; gap:4px; margin-top:18px; padding:12px; background:#f4f7ed; border-left:4px solid #6d9509; }
-.profile-focus small,.summary-metrics span { font-size:9px; font-weight:900; letter-spacing:1.5px; color:#5f8105; }
-.progress-summary { background:#f9fbf5; }
-.summary-metrics { display:flex; gap:28px; margin:18px 0 12px; }
-.summary-metrics>div { display:grid; gap:4px; }
-.summary-metrics b { font-size:30px; line-height:1; }
-.summary-bar { height:12px; background:#e0e5dc; border:1px solid #c8d0c4; overflow:hidden; }
-.summary-bar span { display:block; height:100%; background:var(--green); }
-.notification-list { display:grid; gap:0; }
-.notification-row { display:flex; gap:12px; padding:15px 0; border-bottom:1px solid #e2e5e0; }
-.notification-row>span { width:9px; height:9px; border-radius:50%; background:#bac1ba; margin-top:5px; }
-.notification-row.unread>span { background:var(--green); box-shadow:0 0 0 4px #e7f5bd; }
-.notification-row>div { display:flex; flex-direction:column; gap:4px; }
-.notification-row small { color:#778078; }
-.modal-backdrop { position:fixed; z-index:100; inset:0; background:rgba(8,12,10,.72); display:grid; place-items:center; padding:20px; }
-.install-modal { position:relative; background:var(--paper); border:3px solid var(--ink); box-shadow:9px 9px 0 var(--green); max-width:480px; width:100%; padding:36px; }
-.install-modal h2 { font-size:42px; margin:18px 0; }.install-modal ol { padding-left:22px; }.install-modal li { padding:8px 0; line-height:1.5; }.install-modal li svg { vertical-align:middle; }
-.modal-close { position:absolute; right:15px; top:15px; border:0; background:transparent; cursor:pointer; }
-@media(max-width:900px) { .trick-list { grid-template-columns:minmax(0,1fr); } }
-@media(max-width:560px) {
-  .dash-user>span { display:none; }.install-nav-button { font-size:0; }.install-nav-button svg { width:18px; height:18px; }
-  .install-app-card { grid-template-columns:auto 1fr; }.install-app-card>button { grid-column:1/-1; }
-  .card-heading-row h2 { font-size:clamp(22px,8vw,28px); overflow-wrap:anywhere; }
-  .card-heading-row>svg { width:29px; height:29px; flex:0 0 auto; }
-  .trick-row { padding:12px 0; }
-  .trick-details>div:first-child { align-items:flex-start; flex-direction:column; gap:6px; }
-  .status-pill { align-self:flex-start; }
-  .checklist-coach-note { padding:12px; }
-  .coach-lock { align-items:flex-start; }
-  .coach-lock svg { flex:0 0 auto; }
-  .install-modal { padding:30px 25px; }.install-modal h2 { font-size:35px; }
+.install-nav-button {
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+  border-color: var(--green) !important;
+  color: var(--green) !important;
+}
+.install-app-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 18px;
+  background: #fff;
+  border: 2px solid var(--ink);
+  box-shadow: 5px 5px 0 var(--green);
+  padding: 18px 22px;
+  margin-bottom: 24px;
+}
+.install-app-icon {
+  width: 49px;
+  height: 49px;
+  border-radius: 50%;
+  background: var(--green);
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--ink);
+}
+.install-app-card > div:nth-child(2) {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.install-app-card small,
+.card-heading-row small {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: #5f8105;
+}
+.install-app-card span {
+  font-size: 13px;
+  color: #5c655e;
+}
+.trick-card {
+  grid-column: 1/-1;
+}
+.card-heading-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  border-bottom: 1px solid #d9ded8;
+  padding-bottom: 14px;
+}
+.card-heading-row h2 {
+  margin: 5px 0 0;
+}
+.card-heading-row > svg {
+  color: #6d9509;
+  width: 35px;
+  height: 35px;
+}
+.trick-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: 28px;
+  min-width: 0;
+}
+.trick-row {
+  display: flex;
+  gap: 11px;
+  padding: 14px 0;
+  border-bottom: 1px solid #e2e5e0;
+  min-width: 0;
+}
+.trick-check {
+  width: 25px;
+  height: 25px;
+  flex: 0 0 25px;
+  border: 2px solid #a9b1aa;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+.trick-check.done {
+  background: var(--green);
+  border-color: var(--ink);
+}
+.trick-details {
+  flex: 1;
+  min-width: 0;
+}
+.trick-details > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+.trick-details b {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.trick-details .progress-bar {
+  margin-top: 8px;
+}
+.status-pill {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.65px;
+  font-weight: 900;
+  border-radius: 20px;
+  padding: 4px 7px;
+  background: #ecefea;
+}
+.status-learning {
+  background: #fff2b9;
+}
+.status-consistent {
+  background: #dff6bd;
+}
+.status-mastered {
+  background: var(--green);
+}
+.checklist-coach-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+  margin-top: 16px;
+  padding: 13px 15px;
+  background: #f4f7ed;
+  border-left: 4px solid #6d9509;
+}
+.checklist-coach-note > svg {
+  flex: 0 0 auto;
+  color: #6d9509;
+}
+.checklist-coach-note > div {
+  min-width: 0;
+}
+.checklist-coach-note small {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  color: #5f8105;
+}
+.checklist-coach-note p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.coach-lock {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  color: #667069;
+  margin: 13px 0 0;
+  overflow-wrap: anywhere;
+}
+.muted {
+  color: #5e675f;
+}
+.notification-card {
+  grid-column: 1/-1;
+}
+.dashboard-grid > .next-session {
+  display: none;
+}
+.live-next-session {
+  border-top: 4px solid var(--green);
+}
+.session-empty {
+  display: grid;
+  gap: 5px;
+  padding: 14px 0 4px;
+}
+.session-empty p {
+  margin: 0;
+  font-weight: 900;
+}
+.session-empty span {
+  color: #667069;
+  font-size: 12px;
+}
+.profile-focus {
+  display: grid;
+  gap: 4px;
+  margin-top: 18px;
+  padding: 12px;
+  background: #f4f7ed;
+  border-left: 4px solid #6d9509;
+}
+.profile-focus small,
+.summary-metrics span {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  color: #5f8105;
+}
+.progress-summary {
+  background: #f9fbf5;
+}
+.summary-metrics {
+  display: flex;
+  gap: 28px;
+  margin: 18px 0 12px;
+}
+.summary-metrics > div {
+  display: grid;
+  gap: 4px;
+}
+.summary-metrics b {
+  font-size: 30px;
+  line-height: 1;
+}
+.summary-bar {
+  height: 12px;
+  background: #e0e5dc;
+  border: 1px solid #c8d0c4;
+  overflow: hidden;
+}
+.summary-bar span {
+  display: block;
+  height: 100%;
+  background: var(--green);
+}
+.notification-list {
+  display: grid;
+  gap: 0;
+  max-height: 190px;
+  overflow-y: auto;
+  padding-right: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: #a7b787 transparent;
+}
+.notification-row {
+  display: flex;
+  gap: 12px;
+  padding: 15px 0;
+  border-bottom: 1px solid #e2e5e0;
+}
+.notification-row > span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #bac1ba;
+  margin-top: 5px;
+}
+.notification-row.unread > span {
+  background: var(--green);
+  box-shadow: 0 0 0 4px #e7f5bd;
+}
+.notification-row > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.notification-row small {
+  color: #778078;
+}
+.primary-session-block {
+  padding-top: 14px;
+}
+.session-label {
+  color: #5f8105;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 1.6px;
+}
+.reserved-sessions {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid #d9ded8;
+}
+.reserved-session-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid #e2e5e0;
+}
+.reserved-session-row > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+.reserved-session-row span {
+  color: #667069;
+  font-size: 12px;
+}
+.reserved-session-row small {
+  color: #5f8105;
+  font-weight: 900;
+  font-size: 9px;
+  letter-spacing: 0.8px;
+  text-align: right;
+}
+.modal-backdrop {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  background: rgba(8, 12, 10, 0.72);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+.install-modal {
+  position: relative;
+  background: var(--paper);
+  border: 3px solid var(--ink);
+  box-shadow: 9px 9px 0 var(--green);
+  max-width: 480px;
+  width: 100%;
+  padding: 36px;
+}
+.install-modal h2 {
+  font-size: 42px;
+  margin: 18px 0;
+}
+.install-modal ol {
+  padding-left: 22px;
+}
+.install-modal li {
+  padding: 8px 0;
+  line-height: 1.5;
+}
+.install-modal li svg {
+  vertical-align: middle;
+}
+.modal-close {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+@media (max-width: 900px) {
+  .trick-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 560px) {
+  .dash-user > span {
+    display: none;
+  }
+  .install-nav-button {
+    font-size: 0;
+  }
+  .install-nav-button svg {
+    width: 18px;
+    height: 18px;
+  }
+  .install-app-card {
+    grid-template-columns: auto 1fr;
+  }
+  .install-app-card > button {
+    grid-column: 1/-1;
+  }
+  .card-heading-row h2 {
+    font-size: clamp(22px, 8vw, 28px);
+    overflow-wrap: anywhere;
+  }
+  .card-heading-row > svg {
+    width: 29px;
+    height: 29px;
+    flex: 0 0 auto;
+  }
+  .trick-row {
+    padding: 12px 0;
+  }
+  .trick-details > div:first-child {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .status-pill {
+    align-self: flex-start;
+  }
+  .checklist-coach-note {
+    padding: 12px;
+  }
+  .coach-lock {
+    align-items: flex-start;
+  }
+  .coach-lock svg {
+    flex: 0 0 auto;
+  }
+  .install-modal {
+    padding: 30px 25px;
+  }
+  .install-modal h2 {
+    font-size: 35px;
+  }
 }

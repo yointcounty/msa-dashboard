@@ -77,6 +77,22 @@ create table if not exists public.skater_next_sessions (
   updated_at timestamptz not null default now()
 );
 create index if not exists skater_next_sessions_updated_by_idx on public.skater_next_sessions(updated_by);
+create table if not exists public.skater_addon_sessions (
+  id uuid primary key default gen_random_uuid(),
+  skater_id uuid not null references public.skaters(id) on delete cascade,
+  session_date date not null,
+  start_time time not null,
+  location text not null,
+  title text not null default 'MSA Add-on Session',
+  status text not null default 'reserved' check (status in ('requested','reserved','completed','cancelled')),
+  created_by uuid references public.profiles(id) on delete set null,
+  updated_by uuid references public.profiles(id) on delete set null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+alter table public.skater_addon_sessions enable row level security;
+grant select, insert, update, delete on public.skater_addon_sessions to authenticated;
+create index if not exists skater_addon_sessions_skater_date_idx on public.skater_addon_sessions(skater_id, session_date, start_time);
 
 insert into public.tricks (name, sort_order, category) values
   ('Step Off Safely', 75, 'super_beginner'),

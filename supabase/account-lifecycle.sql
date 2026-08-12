@@ -35,6 +35,30 @@ create policy "next_session_insert_coach" on public.skater_next_sessions for ins
 create policy "next_session_update_coach" on public.skater_next_sessions for update to authenticated using ((select private.is_coach())) with check ((select private.is_coach()) and exists (select 1 from public.skaters s where s.id = skater_next_sessions.skater_id));
 create policy "next_session_delete_coach" on public.skater_next_sessions for delete to authenticated using ((select private.is_coach()));
 create index if not exists skater_next_sessions_updated_by_idx on public.skater_next_sessions(updated_by);
+create table if not exists public.skater_addon_sessions (
+  id uuid primary key default gen_random_uuid(),
+  skater_id uuid not null references public.skaters(id) on delete cascade,
+  session_date date not null,
+  start_time time not null,
+  location text not null,
+  title text not null default 'MSA Add-on Session',
+  status text not null default 'reserved' check (status in ('requested','reserved','completed','cancelled')),
+  created_by uuid references public.profiles(id) on delete set null,
+  updated_by uuid references public.profiles(id) on delete set null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+alter table public.skater_addon_sessions enable row level security;
+grant select, insert, update, delete on public.skater_addon_sessions to authenticated;
+create index if not exists skater_addon_sessions_skater_date_idx on public.skater_addon_sessions(skater_id, session_date, start_time);
+drop policy if exists "addon_session_select_family_or_coach" on public.skater_addon_sessions;
+drop policy if exists "addon_session_insert_coach" on public.skater_addon_sessions;
+drop policy if exists "addon_session_update_coach" on public.skater_addon_sessions;
+drop policy if exists "addon_session_delete_coach" on public.skater_addon_sessions;
+create policy "addon_session_select_family_or_coach" on public.skater_addon_sessions for select to authenticated using (exists (select 1 from public.skaters s where s.id = skater_addon_sessions.skater_id and (s.parent_user_id = (select auth.uid()) or (select private.is_coach()))));
+create policy "addon_session_insert_coach" on public.skater_addon_sessions for insert to authenticated with check ((select private.is_coach()) and exists (select 1 from public.skaters s where s.id = skater_addon_sessions.skater_id));
+create policy "addon_session_update_coach" on public.skater_addon_sessions for update to authenticated using ((select private.is_coach())) with check ((select private.is_coach()) and exists (select 1 from public.skaters s where s.id = skater_addon_sessions.skater_id));
+create policy "addon_session_delete_coach" on public.skater_addon_sessions for delete to authenticated using ((select private.is_coach()));
 
 insert into public.tricks (name, sort_order, category) values
   ('Step Off Safely', 75, 'super_beginner'),
