@@ -81,6 +81,7 @@ export default function Home() {
 
       <section className="final-cta"><div><Users/><span><small>ALREADY PART OF THE CREW?</small><h2>OPEN YOUR SKATER PORTAL.</h2></span></div><div className="final-links"><Link href="/coach" className="coach-footer-link">Coach sign in</Link><Link href={account ? '/dashboard' : '/auth/login'} className="button button-light">{account ? 'Open skater profile' : 'Member sign in'} <ArrowRight size={19}/></Link></div></section>
       <section className="new-family-strip"><p><b>Not enrolled with MSA yet?</b> Enrollment happens outside this private member portal.</p><div><a href="https://miamiskateacademy.com" target="_blank" rel="noreferrer">Visit MiamiSkateAcademy.com</a><a href="sms:+17863947314">Text 786-394-7314</a></div></section>
+      <section className="video-footer-strip" aria-label="Miami Skate Academy session video"><video autoPlay muted loop playsInline preload="metadata" aria-hidden="true"><source src="/videos/msa-skate.mov" type="video/quicktime" /></video><div className="video-footer-overlay" /></section>
       <footer><div className="brand-lockup"><span className="brand-mark">MSA</span><span><b>MIAMI SKATE</b><small>ACADEMY</small></span></div><p>Miami Skate Academy · Part of Yoint County</p><div><a href="tel:+17863947314">786-394-7314</a><a href="mailto:jt@yointcounty.com">jt@yointcounty.com</a></div></footer>
     </main>
   );
