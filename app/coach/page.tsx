@@ -66,7 +66,7 @@ const weekDays = [
 export default function CoachPortal() {
   const [authorized, setAuthorized] = useState<boolean | null>(null);
   const [activate, setActivate] = useState(false);
-  const [coachEmail, setCoachEmail] = useState("jt@yointcounty.com");
+  const [coachEmail, setCoachEmail] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [savingAll, setSavingAll] = useState(false);
@@ -279,11 +279,6 @@ export default function CoachPortal() {
     const form = new FormData(event.currentTarget);
     const email = String(form.get("email")).toLowerCase();
     const password = String(form.get("password"));
-    if (email !== "jt@yointcounty.com") {
-      setMessage("Coach access is authorized for jt@yointcounty.com.");
-      setBusy(false);
-      return;
-    }
     const result = activate
       ? await supabase.auth.signUp({
           email,
@@ -297,7 +292,7 @@ export default function CoachPortal() {
     if (result.error) setMessage(result.error.message);
     else if (activate && !result.data.session)
       setMessage(
-        "Check jt@yointcounty.com to confirm the coach account, then sign in.",
+        "Check your coach email to confirm the account, then sign in.",
       );
     else await loadSkaters();
     setBusy(false);
@@ -807,6 +802,10 @@ export default function CoachPortal() {
               required
             />
           </label>
+          <p className="coach-auth-hint">
+            Use the email assigned to your MSA coach account. Family accounts
+            cannot access this staff portal.
+          </p>
           <label>
             Password
             <input name="password" type="password" minLength={8} required />

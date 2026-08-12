@@ -71,6 +71,12 @@
   background: #fff2b9;
   border: 1px solid #dfbd43;
 }
+.coach-auth-hint {
+  margin: -8px 0 0;
+  color: #667069;
+  font-size: 12px;
+  line-height: 1.45;
+}
 .coach-shell {
   min-height: 100vh;
   background: #eef0eb;
