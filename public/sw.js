@@ -1,5 +1,5 @@
-const CACHE = 'msa-portal-v4';
-const SHELL = ['/auth/login', '/auth/signup', '/images/msa-lessons-v2.png', '/images/msa-coaching-v2.png'];
+const CACHE = 'msa-portal-v5';
+const SHELL = ['/auth/login', '/auth/signup', '/images/msa-real-login.jpg', '/images/msa-real-hero.jpg'];
 self.addEventListener('install', (event) => { event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL))); self.skipWaiting(); });
 self.addEventListener('activate', (event) => { event.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key))))); self.clients.claim(); });
 self.addEventListener('fetch', (event) => {
