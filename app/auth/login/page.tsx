@@ -55,7 +55,7 @@ export default function LoginPage() {
             Keep up with schedules, milestones, and coach updates—all in one
             family-friendly place.
             */}
-            Keep up with schedules, milestones, and coach updates - all in one
+            Keep up with schedules, milestones, and coach updates in one
             family-friendly place.
           </p>
         </div>

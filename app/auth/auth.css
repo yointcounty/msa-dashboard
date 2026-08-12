@@ -30,4 +30,5 @@
 .auth-card h1 {
   line-height: 1.06;
   overflow: visible;
+  padding-bottom: 8px;
 }
