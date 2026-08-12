@@ -1068,7 +1068,10 @@ footer > div:last-child {
 .family-copy h2,
 .faq-section h2,
 .final-cta h2 {
-  line-height: 0.96;
+  line-height: 1.04;
+}
+.program-grid h3 {
+  line-height: 1.15;
 }
 .session-card b,
 .session-card span {
