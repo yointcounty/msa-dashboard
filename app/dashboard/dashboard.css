@@ -5,19 +5,25 @@
 .install-app-card small,.card-heading-row small { font-size:9px; font-weight:900; letter-spacing:2px; color:#5f8105; }
 .install-app-card span { font-size:13px; color:#5c655e; }
 .trick-card { grid-column:1/-1; }
-.card-heading-row { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid #d9ded8; padding-bottom:18px; }
+.card-heading-row { display:flex; justify-content:space-between; align-items:flex-start; gap:14px; border-bottom:1px solid #d9ded8; padding-bottom:14px; }
 .card-heading-row h2 { margin:5px 0 0; }
 .card-heading-row>svg { color:#6d9509; width:35px; height:35px; }
-.trick-list { display:grid; grid-template-columns:1fr 1fr; column-gap:35px; }
-.trick-row { display:flex; gap:14px; padding:20px 0; border-bottom:1px solid #e2e5e0; }
-.trick-check { width:29px; height:29px; flex:0 0 29px; border:2px solid #a9b1aa; border-radius:50%; display:grid; place-items:center; }
+.trick-list { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); column-gap:28px; min-width:0; }
+.trick-row { display:flex; gap:11px; padding:14px 0; border-bottom:1px solid #e2e5e0; min-width:0; }
+.trick-check { width:25px; height:25px; flex:0 0 25px; border:2px solid #a9b1aa; border-radius:50%; display:grid; place-items:center; }
 .trick-check.done { background:var(--green); border-color:var(--ink); }
-.trick-details { flex:1; }
-.trick-details>div:first-child { display:flex; align-items:center; justify-content:space-between; gap:12px; }
-.trick-details p { font-size:12px; color:#697069; margin:5px 0 9px; }
-.status-pill { font-size:9px; text-transform:uppercase; letter-spacing:.7px; font-weight:900; border-radius:20px; padding:5px 8px; background:#ecefea; }
+.trick-details { flex:1; min-width:0; }
+.trick-details>div:first-child { display:flex; align-items:center; justify-content:space-between; gap:10px; min-width:0; }
+.trick-details b { min-width:0; overflow-wrap:anywhere; }
+.trick-details .progress-bar { margin-top:8px; }
+.status-pill { flex:0 0 auto; white-space:nowrap; font-size:8px; text-transform:uppercase; letter-spacing:.65px; font-weight:900; border-radius:20px; padding:4px 7px; background:#ecefea; }
 .status-learning { background:#fff2b9; }.status-consistent { background:#dff6bd; }.status-mastered { background:var(--green); }
-.coach-lock { display:flex; align-items:center; gap:7px; font-size:12px; color:#667069; margin:18px 0 0; }
+.checklist-coach-note { display:flex; align-items:flex-start; gap:10px; min-width:0; margin-top:16px; padding:13px 15px; background:#f4f7ed; border-left:4px solid #6d9509; }
+.checklist-coach-note>svg { flex:0 0 auto; color:#6d9509; }
+.checklist-coach-note>div { min-width:0; }
+.checklist-coach-note small { font-size:9px; font-weight:900; letter-spacing:1.5px; color:#5f8105; }
+.checklist-coach-note p { margin:4px 0 0; font-size:13px; line-height:1.45; overflow-wrap:anywhere; }
+.coach-lock { display:flex; align-items:center; gap:7px; font-size:11px; color:#667069; margin:13px 0 0; overflow-wrap:anywhere; }
 .muted { color:#5e675f; }
 .notification-card { grid-column:1/-1; }
 .notification-list { display:grid; gap:0; }
@@ -30,9 +36,17 @@
 .install-modal { position:relative; background:var(--paper); border:3px solid var(--ink); box-shadow:9px 9px 0 var(--green); max-width:480px; width:100%; padding:36px; }
 .install-modal h2 { font-size:42px; margin:18px 0; }.install-modal ol { padding-left:22px; }.install-modal li { padding:8px 0; line-height:1.5; }.install-modal li svg { vertical-align:middle; }
 .modal-close { position:absolute; right:15px; top:15px; border:0; background:transparent; cursor:pointer; }
-@media(max-width:900px) { .trick-list { grid-template-columns:1fr; } }
+@media(max-width:900px) { .trick-list { grid-template-columns:minmax(0,1fr); } }
 @media(max-width:560px) {
   .dash-user>span { display:none; }.install-nav-button { font-size:0; }.install-nav-button svg { width:18px; height:18px; }
   .install-app-card { grid-template-columns:auto 1fr; }.install-app-card>button { grid-column:1/-1; }
+  .card-heading-row h2 { font-size:clamp(22px,8vw,28px); overflow-wrap:anywhere; }
+  .card-heading-row>svg { width:29px; height:29px; flex:0 0 auto; }
+  .trick-row { padding:12px 0; }
+  .trick-details>div:first-child { align-items:flex-start; flex-direction:column; gap:6px; }
+  .status-pill { align-self:flex-start; }
+  .checklist-coach-note { padding:12px; }
+  .coach-lock { align-items:flex-start; }
+  .coach-lock svg { flex:0 0 auto; }
   .install-modal { padding:30px 25px; }.install-modal h2 { font-size:35px; }
 }
