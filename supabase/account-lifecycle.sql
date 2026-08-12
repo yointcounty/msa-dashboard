@@ -44,6 +44,25 @@ create policy "next_session_insert_coach" on public.skater_next_sessions for ins
 create policy "next_session_update_coach" on public.skater_next_sessions for update to authenticated using ((select private.is_coach())) with check ((select private.is_coach()) and exists (select 1 from public.skaters s where s.id = skater_next_sessions.skater_id));
 create policy "next_session_delete_coach" on public.skater_next_sessions for delete to authenticated using ((select private.is_coach()));
 create index if not exists skater_next_sessions_updated_by_idx on public.skater_next_sessions(updated_by);
+create table if not exists public.skater_secondary_sessions (
+  skater_id uuid primary key references public.skaters(id) on delete cascade,
+  weekly_day smallint not null check (weekly_day between 0 and 6),
+  start_time time not null,
+  location text not null,
+  title text not null default 'MSA Secondary Session',
+  updated_by uuid references public.profiles(id) on delete set null,
+  updated_at timestamptz not null default now()
+);
+alter table public.skater_secondary_sessions enable row level security;
+grant select, insert, update, delete on public.skater_secondary_sessions to authenticated;
+drop policy if exists "secondary_session_select_family_or_coach" on public.skater_secondary_sessions;
+drop policy if exists "secondary_session_insert_coach" on public.skater_secondary_sessions;
+drop policy if exists "secondary_session_update_coach" on public.skater_secondary_sessions;
+drop policy if exists "secondary_session_delete_coach" on public.skater_secondary_sessions;
+create policy "secondary_session_select_family_or_coach" on public.skater_secondary_sessions for select to authenticated using (exists (select 1 from public.skaters s where s.id = skater_secondary_sessions.skater_id and (s.parent_user_id = (select auth.uid()) or (select private.is_coach()))));
+create policy "secondary_session_insert_coach" on public.skater_secondary_sessions for insert to authenticated with check ((select private.is_coach()) and exists (select 1 from public.skaters s where s.id = skater_secondary_sessions.skater_id));
+create policy "secondary_session_update_coach" on public.skater_secondary_sessions for update to authenticated using ((select private.is_coach())) with check ((select private.is_coach()) and exists (select 1 from public.skaters s where s.id = skater_secondary_sessions.skater_id));
+create policy "secondary_session_delete_coach" on public.skater_secondary_sessions for delete to authenticated using ((select private.is_coach()));
 create table if not exists public.skater_addon_sessions (
   id uuid primary key default gen_random_uuid(),
   skater_id uuid not null references public.skaters(id) on delete cascade,

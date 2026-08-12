@@ -79,6 +79,9 @@ export default function Dashboard() {
   const [notifications, setNotifications] = useState<Notice[]>([]);
   const [coachNote, setCoachNote] = useState<CoachNote | null>(null);
   const [nextSession, setNextSession] = useState<NextSession | null>(null);
+  const [secondarySession, setSecondarySession] = useState<NextSession | null>(
+    null,
+  );
   const [addonSessions, setAddonSessions] = useState<AddonSession[]>([]);
   const [toast, setToast] = useState("");
   const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent | null>(
@@ -104,6 +107,7 @@ export default function Dashboard() {
         { data: notices },
         { data: latestNote },
         { data: upcomingSession },
+        { data: recurringSecondary },
         { data: reservedSessions },
       ] = await Promise.all([
         supabase
@@ -130,6 +134,11 @@ export default function Dashboard() {
           .eq("skater_id", current.skaterId)
           .maybeSingle(),
         supabase
+          .from("skater_secondary_sessions")
+          .select("skater_id,weekly_day,start_time,location,title")
+          .eq("skater_id", current.skaterId)
+          .maybeSingle(),
+        supabase
           .from("skater_addon_sessions")
           .select("id,session_date,weekly_day,start_time,location,title,status")
           .eq("skater_id", current.skaterId)
@@ -146,6 +155,7 @@ export default function Dashboard() {
       setNotifications((notices || []) as Notice[]);
       setCoachNote((latestNote || null) as CoachNote | null);
       setNextSession((upcomingSession || null) as NextSession | null);
+      setSecondarySession((recurringSecondary || null) as NextSession | null);
       setAddonSessions((reservedSessions || []) as AddonSession[]);
     }
     void load();
@@ -164,6 +174,11 @@ export default function Dashboard() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "skater_next_sessions" },
+        load,
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "skater_secondary_sessions" },
         load,
       )
       .on(
@@ -398,6 +413,32 @@ export default function Dashboard() {
                 <span>
                   Check back here for the weekly day, time, and location.
                 </span>
+              </div>
+            )}
+            {secondarySession && (
+              <div className="secondary-session-block">
+                <div className="session-label">SECONDARY SESSION</div>
+                <div className="session-info">
+                  <div>
+                    <div className="session-date">
+                      {weeklyDayLabel(
+                        secondarySession.weekly_day,
+                      ).toUpperCase()}{" "}
+                      · EVERY WEEK
+                    </div>
+                    <p>
+                      {new Date(
+                        "1970-01-01T" + secondarySession.start_time,
+                      ).toLocaleTimeString("en-US", {
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })}{" "}
+                      · {secondarySession.location}
+                    </p>
+                    <b>{secondarySession.title}</b>
+                  </div>
+                  <CheckCircle2 size={40} />
+                </div>
               </div>
             )}
             {addonSessions.length > 0 && (

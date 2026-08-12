@@ -266,6 +266,11 @@
 .primary-session-block {
   padding-top: 14px;
 }
+.secondary-session-block {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid #d9ded8;
+}
 .session-label {
   color: #5f8105;
   font-size: 9px;

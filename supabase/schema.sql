@@ -78,6 +78,17 @@ create table if not exists public.skater_next_sessions (
   updated_at timestamptz not null default now()
 );
 create index if not exists skater_next_sessions_updated_by_idx on public.skater_next_sessions(updated_by);
+create table if not exists public.skater_secondary_sessions (
+  skater_id uuid primary key references public.skaters(id) on delete cascade,
+  weekly_day smallint not null check (weekly_day between 0 and 6),
+  start_time time not null,
+  location text not null,
+  title text not null default 'MSA Secondary Session',
+  updated_by uuid references public.profiles(id) on delete set null,
+  updated_at timestamptz not null default now()
+);
+alter table public.skater_secondary_sessions enable row level security;
+grant select, insert, update, delete on public.skater_secondary_sessions to authenticated;
 create table if not exists public.skater_addon_sessions (
   id uuid primary key default gen_random_uuid(),
   skater_id uuid not null references public.skaters(id) on delete cascade,

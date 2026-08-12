@@ -78,12 +78,21 @@ export default function CoachPortal() {
   const [progress, setProgress] = useState<Progress[]>([]);
   const [overallNote, setOverallNote] = useState("");
   const [nextSession, setNextSession] = useState<NextSession | null>(null);
+  const [secondarySession, setSecondarySession] = useState<NextSession | null>(
+    null,
+  );
   const [addonSessions, setAddonSessions] = useState<AddonSession[]>([]);
   const [sessionDraft, setSessionDraft] = useState({
     weekly_day: "",
     start_time: "",
     location: "",
     title: "MSA Member Session",
+  });
+  const [secondaryDraft, setSecondaryDraft] = useState({
+    weekly_day: "",
+    start_time: "",
+    location: "",
+    title: "MSA Secondary Session",
   });
   const [addonDraft, setAddonDraft] = useState({
     schedule_type: "one_time" as "one_time" | "weekly",
@@ -160,12 +169,14 @@ export default function CoachPortal() {
       setProgress([]);
       setOverallNote("");
       setAddonSessions([]);
+      setSecondarySession(null);
       return;
     }
     const [
       { data: trickRows },
       { data: noteRow },
       { data: sessionRow },
+      { data: secondaryRow },
       { data: addonRows },
     ] = await Promise.all([
       supabase
@@ -185,6 +196,11 @@ export default function CoachPortal() {
         .eq("skater_id", selected)
         .maybeSingle(),
       supabase
+        .from("skater_secondary_sessions")
+        .select("skater_id,weekly_day,start_time,location,title")
+        .eq("skater_id", selected)
+        .maybeSingle(),
+      supabase
         .from("skater_addon_sessions")
         .select(
           "id,skater_id,session_date,weekly_day,start_time,location,title,status",
@@ -195,6 +211,7 @@ export default function CoachPortal() {
         .order("start_time"),
     ]);
     const currentSession = (sessionRow || null) as NextSession | null;
+    const currentSecondary = (secondaryRow || null) as NextSession | null;
     setProgress(
       ((trickRows || []) as unknown as Progress[]).sort(
         (a, b) => (a.tricks?.sort_order || 0) - (b.tricks?.sort_order || 0),
@@ -202,6 +219,7 @@ export default function CoachPortal() {
     );
     setOverallNote(noteRow?.body || "");
     setNextSession(currentSession);
+    setSecondarySession(currentSecondary);
     setAddonSessions((addonRows || []) as AddonSession[]);
     setSessionDraft(
       currentSession
@@ -221,6 +239,21 @@ export default function CoachPortal() {
             start_time: "",
             location: "",
             title: "MSA Member Session",
+          },
+    );
+    setSecondaryDraft(
+      currentSecondary
+        ? {
+            weekly_day: String(currentSecondary.weekly_day),
+            start_time: currentSecondary.start_time.slice(0, 5),
+            location: currentSecondary.location,
+            title: currentSecondary.title,
+          }
+        : {
+            weekly_day: "",
+            start_time: "",
+            location: "",
+            title: "MSA Secondary Session",
           },
     );
   }, [selected]);
@@ -415,6 +448,70 @@ export default function CoachPortal() {
     setMessage(
       "Next session updated. The family portal now has the new details.",
     );
+  }
+  async function saveSecondarySession() {
+    if (
+      !selected ||
+      secondaryDraft.weekly_day === "" ||
+      !secondaryDraft.start_time ||
+      !secondaryDraft.location.trim()
+    ) {
+      setMessage(
+        "Choose the secondary weekly day, time, and location before saving.",
+      );
+      return;
+    }
+    setBusy(true);
+    setMessage("Saving secondary session…");
+    const { data, error } = await supabase
+      .from("skater_secondary_sessions")
+      .upsert(
+        {
+          skater_id: selected,
+          weekly_day: Number(secondaryDraft.weekly_day),
+          start_time: secondaryDraft.start_time,
+          location: secondaryDraft.location.trim(),
+          title: secondaryDraft.title.trim() || "MSA Secondary Session",
+          updated_by: coachId,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "skater_id" },
+      )
+      .select("skater_id,weekly_day,start_time,location,title")
+      .single();
+    setBusy(false);
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+    setSecondarySession(data as NextSession);
+    setMessage("Secondary session saved. The family portal is up to date.");
+  }
+  async function clearSecondarySession() {
+    if (
+      !selected ||
+      !secondarySession ||
+      !window.confirm("Clear this secondary session from the family portal?")
+    )
+      return;
+    setBusy(true);
+    const { error } = await supabase
+      .from("skater_secondary_sessions")
+      .delete()
+      .eq("skater_id", selected);
+    setBusy(false);
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+    setSecondarySession(null);
+    setSecondaryDraft({
+      weekly_day: "",
+      start_time: "",
+      location: "",
+      title: "MSA Secondary Session",
+    });
+    setMessage("Secondary session cleared.");
   }
   async function saveAddonSession() {
     if (
@@ -923,22 +1020,6 @@ export default function CoachPortal() {
               </div>
               <div className="session-editor-fields">
                 <label>
-                  Schedule
-                  <select
-                    value={addonDraft.schedule_type}
-                    onChange={(event) =>
-                      setAddonDraft((draft) => ({
-                        ...draft,
-                        schedule_type: event.target.value as
-                          "one_time" | "weekly",
-                      }))
-                    }
-                  >
-                    <option value="one_time">One-time add-on</option>
-                    <option value="weekly">Consistent weekly add-on</option>
-                  </select>
-                </label>
-                <label>
                   Title
                   <input
                     value={sessionDraft.title}
@@ -1017,6 +1098,97 @@ export default function CoachPortal() {
                 )}
               </div>
             </section>
+            <section className="next-session-editor secondary-session-editor">
+              <div>
+                <p className="eyebrow">
+                  <span /> Secondary schedule
+                </p>
+                <h2>SECONDARY SESSION</h2>
+                <p>
+                  Set the second consistent weekly session. Add-ons stay
+                  optional below.
+                </p>
+              </div>
+              <div className="session-editor-fields">
+                <label>
+                  Title
+                  <input
+                    value={secondaryDraft.title}
+                    onChange={(event) =>
+                      setSecondaryDraft((draft) => ({
+                        ...draft,
+                        title: event.target.value,
+                      }))
+                    }
+                    placeholder="MSA Secondary Session"
+                  />
+                </label>
+                <label>
+                  Weekly day
+                  <select
+                    value={secondaryDraft.weekly_day}
+                    onChange={(event) =>
+                      setSecondaryDraft((draft) => ({
+                        ...draft,
+                        weekly_day: event.target.value,
+                      }))
+                    }
+                  >
+                    <option value="">Choose a day</option>
+                    <option value="0">Sunday</option>
+                    <option value="1">Monday</option>
+                    <option value="2">Tuesday</option>
+                    <option value="3">Wednesday</option>
+                    <option value="4">Thursday</option>
+                    <option value="5">Friday</option>
+                    <option value="6">Saturday</option>
+                  </select>
+                </label>
+                <label>
+                  Time
+                  <input
+                    type="time"
+                    value={secondaryDraft.start_time}
+                    onChange={(event) =>
+                      setSecondaryDraft((draft) => ({
+                        ...draft,
+                        start_time: event.target.value,
+                      }))
+                    }
+                  />
+                </label>
+                <label className="session-location-field">
+                  Location
+                  <input
+                    value={secondaryDraft.location}
+                    onChange={(event) =>
+                      setSecondaryDraft((draft) => ({
+                        ...draft,
+                        location: event.target.value,
+                      }))
+                    }
+                    placeholder="Kendall Skatepark"
+                  />
+                </label>
+              </div>
+              <div className="session-editor-actions">
+                <button onClick={saveSecondarySession} disabled={busy}>
+                  <CalendarDays size={16} />{" "}
+                  {secondarySession
+                    ? "Update secondary session"
+                    : "Set secondary session"}
+                </button>
+                {secondarySession && (
+                  <button
+                    className="text-button"
+                    onClick={clearSecondarySession}
+                    disabled={busy}
+                  >
+                    Clear secondary
+                  </button>
+                )}
+              </div>
+            </section>
             <section className="addon-session-editor">
               <div>
                 <p className="eyebrow">
@@ -1029,6 +1201,22 @@ export default function CoachPortal() {
                 </p>
               </div>
               <div className="session-editor-fields">
+                <label>
+                  Schedule
+                  <select
+                    value={addonDraft.schedule_type}
+                    onChange={(event) =>
+                      setAddonDraft((draft) => ({
+                        ...draft,
+                        schedule_type: event.target.value as
+                          "one_time" | "weekly",
+                      }))
+                    }
+                  >
+                    <option value="one_time">One-time add-on</option>
+                    <option value="weekly">Consistent weekly add-on</option>
+                  </select>
+                </label>
                 <label>
                   Title
                   <input
