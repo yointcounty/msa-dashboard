@@ -81,7 +81,8 @@ create index if not exists skater_next_sessions_updated_by_idx on public.skater_
 create table if not exists public.skater_addon_sessions (
   id uuid primary key default gen_random_uuid(),
   skater_id uuid not null references public.skaters(id) on delete cascade,
-  session_date date not null,
+  session_date date,
+  weekly_day smallint check (weekly_day between 0 and 6),
   start_time time not null,
   location text not null,
   title text not null default 'MSA Add-on Session',

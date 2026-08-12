@@ -46,12 +46,22 @@ type NextSession = {
 type AddonSession = {
   id: string;
   skater_id: string;
-  session_date: string;
+  session_date: string | null;
+  weekly_day: number | null;
   start_time: string;
   location: string;
   title: string;
   status: string;
 };
+const weekDays = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
 
 export default function CoachPortal() {
   const [authorized, setAuthorized] = useState<boolean | null>(null);
@@ -76,7 +86,9 @@ export default function CoachPortal() {
     title: "MSA Member Session",
   });
   const [addonDraft, setAddonDraft] = useState({
+    schedule_type: "one_time" as "one_time" | "weekly",
     session_date: "",
+    weekly_day: "",
     start_time: "",
     location: "",
     title: "MSA Add-on Session",
@@ -174,7 +186,9 @@ export default function CoachPortal() {
         .maybeSingle(),
       supabase
         .from("skater_addon_sessions")
-        .select("id,skater_id,session_date,start_time,location,title,status")
+        .select(
+          "id,skater_id,session_date,weekly_day,start_time,location,title,status",
+        )
         .eq("skater_id", selected)
         .in("status", ["requested", "reserved"])
         .order("session_date")
@@ -405,12 +419,13 @@ export default function CoachPortal() {
   async function saveAddonSession() {
     if (
       !selected ||
-      !addonDraft.session_date ||
+      (addonDraft.schedule_type === "one_time" && !addonDraft.session_date) ||
+      (addonDraft.schedule_type === "weekly" && addonDraft.weekly_day === "") ||
       !addonDraft.start_time ||
       !addonDraft.location.trim()
     ) {
       setMessage(
-        "Add the add-on date, time, and location before reserving it.",
+        "Choose a one-time date or weekly day, then add the time and location.",
       );
       return;
     }
@@ -420,7 +435,14 @@ export default function CoachPortal() {
       .from("skater_addon_sessions")
       .insert({
         skater_id: selected,
-        session_date: addonDraft.session_date,
+        session_date:
+          addonDraft.schedule_type === "one_time"
+            ? addonDraft.session_date
+            : null,
+        weekly_day:
+          addonDraft.schedule_type === "weekly"
+            ? Number(addonDraft.weekly_day)
+            : null,
         start_time: addonDraft.start_time,
         location: addonDraft.location.trim(),
         title: addonDraft.title.trim() || "MSA Add-on Session",
@@ -428,7 +450,9 @@ export default function CoachPortal() {
         created_by: coachId,
         updated_by: coachId,
       })
-      .select("id,skater_id,session_date,start_time,location,title,status")
+      .select(
+        "id,skater_id,session_date,weekly_day,start_time,location,title,status",
+      )
       .single();
     setBusy(false);
     if (error) {
@@ -437,13 +461,15 @@ export default function CoachPortal() {
     }
     setAddonSessions((sessions) =>
       [...sessions, data as AddonSession].sort((a, b) =>
-        `${a.session_date} ${a.start_time}`.localeCompare(
-          `${b.session_date} ${b.start_time}`,
+        `${a.session_date || ""} ${a.weekly_day ?? 7} ${a.start_time}`.localeCompare(
+          `${b.session_date || ""} ${b.weekly_day ?? 7} ${b.start_time}`,
         ),
       ),
     );
     setAddonDraft({
+      schedule_type: "one_time",
       session_date: "",
+      weekly_day: "",
       start_time: "",
       location: "",
       title: "MSA Add-on Session",
@@ -897,6 +923,22 @@ export default function CoachPortal() {
               </div>
               <div className="session-editor-fields">
                 <label>
+                  Schedule
+                  <select
+                    value={addonDraft.schedule_type}
+                    onChange={(event) =>
+                      setAddonDraft((draft) => ({
+                        ...draft,
+                        schedule_type: event.target.value as
+                          "one_time" | "weekly",
+                      }))
+                    }
+                  >
+                    <option value="one_time">One-time add-on</option>
+                    <option value="weekly">Consistent weekly add-on</option>
+                  </select>
+                </label>
+                <label>
                   Title
                   <input
                     value={sessionDraft.title}
@@ -1000,19 +1042,41 @@ export default function CoachPortal() {
                     placeholder="MSA Add-on Session"
                   />
                 </label>
-                <label>
-                  Date
-                  <input
-                    type="date"
-                    value={addonDraft.session_date}
-                    onChange={(event) =>
-                      setAddonDraft((draft) => ({
-                        ...draft,
-                        session_date: event.target.value,
-                      }))
-                    }
-                  />
-                </label>
+                {addonDraft.schedule_type === "weekly" ? (
+                  <label>
+                    Weekly day
+                    <select
+                      value={addonDraft.weekly_day}
+                      onChange={(event) =>
+                        setAddonDraft((draft) => ({
+                          ...draft,
+                          weekly_day: event.target.value,
+                        }))
+                      }
+                    >
+                      <option value="">Choose a day</option>
+                      {weekDays.map((day, index) => (
+                        <option value={index} key={day}>
+                          {day}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                ) : (
+                  <label>
+                    Date
+                    <input
+                      type="date"
+                      value={addonDraft.session_date}
+                      onChange={(event) =>
+                        setAddonDraft((draft) => ({
+                          ...draft,
+                          session_date: event.target.value,
+                        }))
+                      }
+                    />
+                  </label>
+                )}
                 <label>
                   Time
                   <input
@@ -1051,13 +1115,15 @@ export default function CoachPortal() {
                     <div className="coach-addon-row" key={session.id}>
                       <div>
                         <b>
-                          {new Date(
-                            session.session_date + "T12:00:00",
-                          ).toLocaleDateString("en-US", {
-                            weekday: "short",
-                            month: "short",
-                            day: "numeric",
-                          })}
+                          {session.weekly_day !== null
+                            ? `${weekDays[session.weekly_day]} · EVERY WEEK`
+                            : new Date(
+                                session.session_date + "T12:00:00",
+                              ).toLocaleDateString("en-US", {
+                                weekday: "short",
+                                month: "short",
+                                day: "numeric",
+                              })}
                         </b>
                         <span>
                           {new Date(

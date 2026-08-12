@@ -47,7 +47,8 @@ create index if not exists skater_next_sessions_updated_by_idx on public.skater_
 create table if not exists public.skater_addon_sessions (
   id uuid primary key default gen_random_uuid(),
   skater_id uuid not null references public.skaters(id) on delete cascade,
-  session_date date not null,
+  session_date date,
+  weekly_day smallint check (weekly_day between 0 and 6),
   start_time time not null,
   location text not null,
   title text not null default 'MSA Add-on Session',
@@ -60,6 +61,10 @@ create table if not exists public.skater_addon_sessions (
 alter table public.skater_addon_sessions enable row level security;
 grant select, insert, update, delete on public.skater_addon_sessions to authenticated;
 create index if not exists skater_addon_sessions_skater_date_idx on public.skater_addon_sessions(skater_id, session_date, start_time);
+alter table public.skater_addon_sessions add column if not exists weekly_day smallint;
+alter table public.skater_addon_sessions alter column session_date drop not null;
+alter table public.skater_addon_sessions drop constraint if exists skater_addon_sessions_weekly_day_check;
+alter table public.skater_addon_sessions add constraint skater_addon_sessions_weekly_day_check check (weekly_day between 0 and 6);
 drop policy if exists "addon_session_select_family_or_coach" on public.skater_addon_sessions;
 drop policy if exists "addon_session_insert_coach" on public.skater_addon_sessions;
 drop policy if exists "addon_session_update_coach" on public.skater_addon_sessions;

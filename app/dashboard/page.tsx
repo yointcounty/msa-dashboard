@@ -49,7 +49,8 @@ type NextSession = {
 };
 type AddonSession = {
   id: string;
-  session_date: string;
+  session_date: string | null;
+  weekly_day: number | null;
   start_time: string;
   location: string;
   title: string;
@@ -130,7 +131,7 @@ export default function Dashboard() {
           .maybeSingle(),
         supabase
           .from("skater_addon_sessions")
-          .select("id,session_date,start_time,location,title,status")
+          .select("id,session_date,weekly_day,start_time,location,title,status")
           .eq("skater_id", current.skaterId)
           .in("status", ["requested", "reserved"])
           .order("session_date")
@@ -394,14 +395,15 @@ export default function Dashboard() {
             ) : (
               <div className="session-empty">
                 <p>Your primary session is not scheduled yet.</p>
-                <span>Check back here for the weekly day, time, and location.</span>
+                <span>
+                  Check back here for the weekly day, time, and location.
+                </span>
               </div>
             )}
             {addonSessions.length > 0 && (
               <div className="reserved-sessions">
                 <div className="session-label">OTHER SESSIONS RESERVED</div>
                 {addonSessions.map((session) => {
-                  const date = new Date(session.session_date + "T12:00:00");
                   const time = new Date(
                     "1970-01-01T" + session.start_time,
                   ).toLocaleTimeString("en-US", {
@@ -412,11 +414,15 @@ export default function Dashboard() {
                     <div className="reserved-session-row" key={session.id}>
                       <div>
                         <b>
-                          {date.toLocaleDateString("en-US", {
-                            weekday: "short",
-                            month: "short",
-                            day: "numeric",
-                          })}
+                          {session.weekly_day !== null
+                            ? `${["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][session.weekly_day]} · EVERY WEEK`
+                            : new Date(
+                                session.session_date + "T12:00:00",
+                              ).toLocaleDateString("en-US", {
+                                weekday: "short",
+                                month: "short",
+                                day: "numeric",
+                              })}
                         </b>
                         <span>
                           {time} · {session.location}
