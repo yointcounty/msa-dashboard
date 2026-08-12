@@ -66,6 +66,7 @@ const weekDays = [
 export default function CoachPortal() {
   const [authorized, setAuthorized] = useState<boolean | null>(null);
   const [activate, setActivate] = useState(false);
+  const [coachEmail, setCoachEmail] = useState("jt@yointcounty.com");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [savingAll, setSavingAll] = useState(false);
@@ -797,8 +798,13 @@ export default function CoachPortal() {
             <input
               name="email"
               type="email"
-              value="jt@yointcounty.com"
-              readOnly
+              value={coachEmail}
+              onChange={(event) => setCoachEmail(event.target.value)}
+              autoComplete="username"
+              placeholder="coach@example.com"
+              autoCapitalize="none"
+              spellCheck={false}
+              required
             />
           </label>
           <label>
