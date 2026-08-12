@@ -18,6 +18,7 @@ export default function CoachPortal() {
   const [skaters, setSkaters] = useState<Skater[]>([]);
   const [selected, setSelected] = useState('');
   const [progress, setProgress] = useState<Progress[]>([]);
+  const [checklistNote, setChecklistNote] = useState('');
 
   const loadSkaters = useCallback(async () => {
     const { data: auth } = await supabase.auth.getUser();
@@ -35,7 +36,9 @@ export default function CoachPortal() {
   const loadProgress = useCallback(async () => {
     if (!selected) { setProgress([]); return; }
     const { data } = await supabase.from('skater_tricks').select('trick_id, status, progress, coach_note, tricks(name, sort_order)').eq('skater_id', selected);
-    setProgress(((data || []) as unknown as Progress[]).sort((a,b)=>(a.tricks?.sort_order || 0)-(b.tricks?.sort_order || 0)));
+    const sorted = ((data || []) as unknown as Progress[]).sort((a,b)=>(a.tricks?.sort_order || 0)-(b.tricks?.sort_order || 0));
+    setProgress(sorted);
+    setChecklistNote(sorted.find((item)=>item.coach_note.trim())?.coach_note || '');
   }, [selected]);
 
   useEffect(() => { const timer = window.setTimeout(() => { void loadSkaters(); }, 0); return () => window.clearTimeout(timer); }, [loadSkaters]);
@@ -63,10 +66,21 @@ export default function CoachPortal() {
   async function save(item: Progress) {
     setMessage('Saving coach update…');
     const { error } = await supabase.from('skater_tricks').update({
-      status: item.status, progress: item.progress, coach_note: item.coach_note,
+      status: item.status, progress: item.progress,
       updated_by: coachId, updated_at: new Date().toISOString(),
     }).eq('skater_id', selected).eq('trick_id', item.trick_id);
     setMessage(error ? error.message : `${item.tricks?.name} updated. The family was notified in their portal.`);
+  }
+
+  async function saveChecklistNote() {
+    const noteRow = progress[0];
+    if (!noteRow) return;
+    setMessage('Saving checklist note…');
+    const { error } = await supabase.from('skater_tricks').update({
+      coach_note: checklistNote, updated_by: coachId, updated_at: new Date().toISOString(),
+    }).eq('skater_id', selected).eq('trick_id', noteRow.trick_id);
+    setProgress((items)=>items.map((item,index)=>index===0 ? {...item,coach_note:checklistNote} : item));
+    setMessage(error ? error.message : `Coach note saved for ${activeSkater?.name || 'this skater'}’s checklist.`);
   }
 
   if (authorized === null) return <main className="coach-loading">Opening coach portal…</main>;
@@ -79,7 +93,8 @@ export default function CoachPortal() {
       {skaters.length === 0 ? <section className="empty-coach"><Users/><h2>No skater accounts yet.</h2><p>Enrolled families will appear here after activating their portal access.</p></section> : <>
         <section className="skater-picker"><label htmlFor="skater">Editing progress for</label><select id="skater" value={selected} onChange={(e)=>setSelected(e.target.value)}>{skaters.map((skater)=><option value={skater.id} key={skater.id}>{skater.name} — {skater.profiles?.parent_name || skater.profiles?.email}</option>)}</select><div><ClipboardCheck/><span><b>{activeSkater?.name}</b><small>{activeSkater?.profiles?.email}</small></span></div></section>
         <section className="coach-tricks"><div className="coach-section-title"><div><p className="eyebrow"><span/> Main trick checklist</p><h2>Update the roadmap</h2></div><BellRing/><p>Saving automatically creates an in-app notification.</p></div>
-          <div className="coach-trick-list">{progress.map((item)=><article key={item.trick_id}><div className="trick-name"><CheckCircle2/><b>{item.tricks?.name}</b></div><label>Status<select value={item.status} onChange={(e)=>edit(item.trick_id,{status:e.target.value})}><option value="not_started">Not started</option><option value="learning">Learning</option><option value="landed">Landed</option><option value="consistent">Consistent</option><option value="mastered">Mastered</option></select></label><label>Progress <b>{item.progress}%</b><input type="range" min="0" max="100" step="5" value={item.progress} onChange={(e)=>edit(item.trick_id,{progress:Number(e.target.value)})}/></label><label>Coach note<textarea value={item.coach_note} onChange={(e)=>edit(item.trick_id,{coach_note:e.target.value})} placeholder="What improved? What should they work on next?"/></label><button onClick={()=>save(item)}><Save size={16}/> Save update</button></article>)}</div>
+          <div className="coach-trick-list">{progress.map((item)=><article key={item.trick_id}><div className="trick-name"><CheckCircle2/><b>{item.tricks?.name}</b></div><label>Status<select value={item.status} onChange={(e)=>edit(item.trick_id,{status:e.target.value})}><option value="not_started">Not started</option><option value="learning">Learning</option><option value="landed">Landed</option><option value="consistent">Consistent</option><option value="mastered">Mastered</option></select></label><label>Progress <b>{item.progress}%</b><input type="range" min="0" max="100" step="5" value={item.progress} onChange={(e)=>edit(item.trick_id,{progress:Number(e.target.value)})}/></label><button onClick={()=>save(item)}><Save size={16}/> Save trick</button></article>)}</div>
+          <div className="coach-checklist-note"><div><p className="eyebrow"><span/> One note for this skater</p><h3>Checklist coach note</h3></div><label>Note<textarea value={checklistNote} onChange={(e)=>setChecklistNote(e.target.value)} placeholder="What improved? What should they work on next?"/></label><button onClick={saveChecklistNote}><Save size={16}/> Save coach note</button></div>
         </section></>}
       {message && <div className="coach-toast" role="status">{message}</div>}
     </div>
