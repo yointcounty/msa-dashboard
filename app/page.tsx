@@ -29,7 +29,7 @@ export default function Home() {
           <span><b>MIAMI SKATE</b><small>ACADEMY</small></span>
         </Link>
         <div className="desktop-nav">
-          <a href="#app">Progress</a><a href="#families">For families</a><a href="#faq">FAQ</a>
+          <a href="#programs">Programs</a><a href="#app">Progress</a><a href="#families">For families</a><a href="#faq">FAQ</a>
         </div>
         <div className="nav-actions">
           <InstallAppButton compact/><Link href="/coach" className="coach-nav-link">Coach sign in</Link><Link href={account ? '/dashboard' : '/auth/login'} className="text-link">{account ? `${account.childName}'s profile` : 'Member sign in'}</Link>
@@ -37,7 +37,7 @@ export default function Home() {
         </div>
         <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu" aria-expanded={menuOpen}>{menuOpen ? <X/> : <Menu/>}</button>
       </nav>
-      {menuOpen && <div className="mobile-menu"><a href="#app" onClick={() => setMenuOpen(false)}>Progress</a><a href="#families" onClick={() => setMenuOpen(false)}>For families</a><a href="#faq" onClick={() => setMenuOpen(false)}>FAQ</a><Link href="/coach" className="coach-nav-link">Coach sign in</Link><Link href={account ? '/dashboard' : '/auth/login'}>{account ? `${account.childName}'s profile` : 'Member sign in'}</Link><Link href={account ? '/dashboard' : '/auth/signup'} className="button">{account ? 'Open dashboard' : 'Activate access'}</Link></div>}
+      {menuOpen && <div className="mobile-menu"><a href="#programs" onClick={() => setMenuOpen(false)}>Programs</a><a href="#app" onClick={() => setMenuOpen(false)}>Progress</a><a href="#families" onClick={() => setMenuOpen(false)}>For families</a><a href="#faq" onClick={() => setMenuOpen(false)}>FAQ</a><Link href="/coach" className="coach-nav-link">Coach sign in</Link><Link href={account ? '/dashboard' : '/auth/login'}>{account ? `${account.childName}'s profile` : 'Member sign in'}</Link><Link href={account ? '/dashboard' : '/auth/signup'} className="button">{account ? 'Open dashboard' : 'Activate access'}</Link></div>}
 
       <section className="hero">
         <div className="hero-copy">
@@ -60,6 +60,8 @@ export default function Home() {
       <section className="proof-strip" aria-label="Academy highlights">
         <div><strong>100+</strong><span>ENROLLED MEMBERS</span></div><div><strong>4:1</strong><span>GROUP COACH RATIO</span></div><div><strong>3</strong><span>SOUTH FLORIDA AREAS</span></div><div><strong>ALL</strong><span>SKILL LEVELS WELCOME</span></div>
       </section>
+
+      <section className="programs-section" id="programs"><div className="programs-intro"><p className="eyebrow"><span /> Choose your next step</p><h2>ONE CLEAR<br /><em>PATH FORWARD.</em></h2><p>Start where your skater is today. We build confidence first, then turn small wins into a repeatable progression.</p><a className="button button-dark" href="sms:+17863947314?body=Hi%20JT%2C%20I%27d%20like%20to%20find%20the%20right%20MSA%20program%20for%20my%20skater.">Find the right fit <ArrowRight size={18} /></a></div><div className="program-grid"><article><CalendarDays /><small>START HERE</small><h3>First Ride</h3><p>A relaxed first session to learn safety, board feel, and the right next step.</p></article><article><Trophy /><small>BUILD FOUNDATIONS</small><h3>MSA Foundations</h3><p>A focused multi-week path with weekly goals and a coach update after every session.</p></article><article><Users /><small>KEEP PROGRESSING</small><h3>Progress Membership</h3><p>Consistent coaching, portal access, and a clear roadmap that stays with your family.</p></article><article><Sparkles /><small>MAKE IT MEMORABLE</small><h3>Camps & Clinics</h3><p>School-break sessions, creative skate activities, and skill-focused clinics for growing skaters.</p></article></div></section>
 
       <section className="app-preview-section" id="app">
         <div className="app-preview-copy"><p className="eyebrow"><span/> The MSA skater app</p><h2>EVERY TRICK.<br/><em>EVERY WIN.</em></h2><p>Install the private portal and see exactly what your skater is learning—from the first drop-in to a clean kickflip. Coaches update progress after sessions; families celebrate the climb.</p><InstallAppButton/></div>
