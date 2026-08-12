@@ -56,6 +56,14 @@ type AddonSession = {
   title: string;
   status: string;
 };
+type MediaItem = {
+  id: string;
+  storage_path: string;
+  kind: "photo" | "video";
+  caption: string | null;
+  created_at: string;
+  url: string;
+};
 const labelStatus = (value: string) =>
   value.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 const weekDays = [
@@ -83,6 +91,7 @@ export default function Dashboard() {
     null,
   );
   const [addonSessions, setAddonSessions] = useState<AddonSession[]>([]);
+  const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
   const [toast, setToast] = useState("");
   const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent | null>(
     null,
@@ -109,6 +118,7 @@ export default function Dashboard() {
         { data: upcomingSession },
         { data: recurringSecondary },
         { data: reservedSessions },
+        { data: mediaRows },
       ] = await Promise.all([
         supabase
           .from("skater_tricks")
@@ -145,6 +155,12 @@ export default function Dashboard() {
           .in("status", ["requested", "reserved"])
           .order("session_date")
           .order("start_time"),
+        supabase
+          .from("media")
+          .select("id,storage_path,kind,caption,created_at")
+          .eq("skater_id", current.skaterId)
+          .order("created_at", { ascending: false })
+          .limit(24),
       ]);
       if (!active) return;
       setTrickProgress(
@@ -157,6 +173,19 @@ export default function Dashboard() {
       setNextSession((upcomingSession || null) as NextSession | null);
       setSecondarySession((recurringSecondary || null) as NextSession | null);
       setAddonSessions((reservedSessions || []) as AddonSession[]);
+      const signedMedia = await Promise.all(
+        ((mediaRows || []) as Array<Omit<MediaItem, "url">>).map(
+          async (item) => {
+            const { data } = await supabase.storage
+              .from("skater-media")
+              .createSignedUrl(item.storage_path, 60 * 60);
+            return data?.signedUrl ? { ...item, url: data.signedUrl } : null;
+          },
+        ),
+      );
+      setMediaItems(
+        signedMedia.filter((item): item is MediaItem => item !== null),
+      );
     }
     void load();
     const channel = supabase
@@ -189,6 +218,11 @@ export default function Dashboard() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "notifications" },
+        load,
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "media" },
         load,
       )
       .subscribe();
@@ -587,6 +621,43 @@ export default function Dashboard() {
               <LockKeyhole size={15} /> Progress is updated live by your MSA
               coach after sessions.
             </p>
+          </div>
+          <div className="dash-card media-gallery-card">
+            <div className="card-heading-row">
+              <div>
+                <small>SESSION MEDIA</small>
+                <h2>Gallery</h2>
+              </div>
+              <span className="media-count">{mediaItems.length} saved</span>
+            </div>
+            {mediaItems.length ? (
+              <div className="media-gallery">
+                {mediaItems.map((item) => (
+                  <figure key={item.id}>
+                    {item.kind === "video" ? (
+                      <video src={item.url} controls preload="metadata" />
+                    ) : (
+                      <img
+                        src={item.url}
+                        alt={item.caption || "MSA session photo"}
+                        loading="lazy"
+                      />
+                    )}
+                    <figcaption>
+                      <b>{item.caption || "MSA session"}</b>
+                      <small>
+                        {new Date(item.created_at).toLocaleDateString()}
+                      </small>
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+            ) : (
+              <p className="muted">
+                Your coach&apos;s photos and videos will appear here after they
+                upload them.
+              </p>
+            )}
           </div>
           <div className="dash-card notification-card">
             <div className="card-heading-row">

@@ -375,14 +375,40 @@ export default function CoachPortal() {
   async function uploadMedia(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     event.target.value = "";
-    if (!file || !selected) return;
+    if (!file) return;
+    if (!selected) {
+      setMessage("Choose a skater before uploading media.");
+      return;
+    }
+    const isVideo =
+      file.type.startsWith("video/") ||
+      /\.(mp4|mov|m4v|webm|avi)$/i.test(file.name);
+    const isPhoto =
+      file.type.startsWith("image/") ||
+      /\.(jpg|jpeg|png|gif|webp|heic|heif)$/i.test(file.name);
+    if (!isVideo && !isPhoto) {
+      setMessage("Choose a photo or video file.");
+      return;
+    }
+    if (file.size > 500 * 1024 * 1024) {
+      setMessage("That file is larger than 500 MB. Choose a smaller file.");
+      return;
+    }
     setMediaBusy(true);
     setMessage("Uploading media…");
     const safeName = file.name.toLowerCase().replace(/[^a-z0-9._-]+/g, "-");
-    const path = `${selected}/${crypto.randomUUID()}-${safeName}`;
+    const id =
+      typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const path = `${selected}/${id}-${safeName}`;
     const { error: uploadError } = await supabase.storage
       .from("skater-media")
-      .upload(path, file, { upsert: false });
+      .upload(path, file, {
+        upsert: false,
+        cacheControl: "3600",
+        contentType: file.type || (isVideo ? "video/mp4" : "image/jpeg"),
+      });
     if (uploadError) {
       setMediaBusy(false);
       setMessage(uploadError.message);
@@ -391,10 +417,13 @@ export default function CoachPortal() {
     const { error: mediaError } = await supabase.from("media").insert({
       skater_id: selected,
       storage_path: path,
-      kind: file.type.startsWith("video/") ? "video" : "photo",
+      kind: isVideo ? "video" : "photo",
       caption: file.name.replace(/\.[^.]+$/, ""),
       created_by: coachId,
     });
+    if (mediaError) {
+      await supabase.storage.from("skater-media").remove([path]);
+    }
     setMediaBusy(false);
     setMessage(
       mediaError
