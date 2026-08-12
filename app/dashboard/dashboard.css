@@ -26,6 +26,11 @@
 .coach-lock { display:flex; align-items:center; gap:7px; font-size:11px; color:#667069; margin:13px 0 0; overflow-wrap:anywhere; }
 .muted { color:#5e675f; }
 .notification-card { grid-column:1/-1; }
+.dashboard-grid > .next-session { display:none; }
+.live-next-session { border-top:4px solid var(--green); }
+.session-empty { display:grid; gap:5px; padding:14px 0 4px; }
+.session-empty p { margin:0; font-weight:900; }
+.session-empty span { color:#667069; font-size:12px; }
 .profile-focus { display:grid; gap:4px; margin-top:18px; padding:12px; background:#f4f7ed; border-left:4px solid #6d9509; }
 .profile-focus small,.summary-metrics span { font-size:9px; font-weight:900; letter-spacing:1.5px; color:#5f8105; }
 .progress-summary { background:#f9fbf5; }

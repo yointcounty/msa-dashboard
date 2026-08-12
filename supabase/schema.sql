@@ -67,5 +67,14 @@ create table if not exists public.media (
   created_by uuid references public.profiles(id) on delete set null,
   created_at timestamptz not null default now()
 );
+create table if not exists public.skater_next_sessions (
+  skater_id uuid primary key references public.skaters(id) on delete cascade,
+  session_date date not null,
+  start_time time not null,
+  location text not null,
+  title text not null default 'MSA Member Session',
+  updated_by uuid references public.profiles(id) on delete set null,
+  updated_at timestamptz not null default now()
+);
 
 insert into storage.buckets (id, name, public) values ('skater-media', 'skater-media', false) on conflict (id) do nothing;

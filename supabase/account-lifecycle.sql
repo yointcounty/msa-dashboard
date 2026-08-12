@@ -13,6 +13,27 @@ create table if not exists public.media (
   created_by uuid references public.profiles(id) on delete set null,
   created_at timestamptz not null default now()
 );
+
+create table if not exists public.skater_next_sessions (
+  skater_id uuid primary key references public.skaters(id) on delete cascade,
+  session_date date not null,
+  start_time time not null,
+  location text not null,
+  title text not null default 'MSA Member Session',
+  updated_by uuid references public.profiles(id) on delete set null,
+  updated_at timestamptz not null default now()
+);
+alter table public.skater_next_sessions enable row level security;
+grant select, insert, update, delete on public.skater_next_sessions to authenticated;
+create index if not exists skater_next_sessions_date_idx on public.skater_next_sessions(session_date);
+drop policy if exists "next_session_select_family_or_coach" on public.skater_next_sessions;
+drop policy if exists "next_session_insert_coach" on public.skater_next_sessions;
+drop policy if exists "next_session_update_coach" on public.skater_next_sessions;
+drop policy if exists "next_session_delete_coach" on public.skater_next_sessions;
+create policy "next_session_select_family_or_coach" on public.skater_next_sessions for select to authenticated using (exists (select 1 from public.skaters s where s.id = skater_next_sessions.skater_id and (s.parent_user_id = (select auth.uid()) or (select private.is_coach()))));
+create policy "next_session_insert_coach" on public.skater_next_sessions for insert to authenticated with check ((select private.is_coach()) and exists (select 1 from public.skaters s where s.id = skater_next_sessions.skater_id));
+create policy "next_session_update_coach" on public.skater_next_sessions for update to authenticated using ((select private.is_coach())) with check ((select private.is_coach()) and exists (select 1 from public.skaters s where s.id = skater_next_sessions.skater_id));
+create policy "next_session_delete_coach" on public.skater_next_sessions for delete to authenticated using ((select private.is_coach()));
 alter table public.media enable row level security;
 grant select, insert, update, delete on public.media to authenticated;
 create index if not exists media_skater_id_idx on public.media(skater_id);

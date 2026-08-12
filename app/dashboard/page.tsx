@@ -12,6 +12,7 @@ type InstallPromptEvent = Event & { prompt: () => Promise<void>; userChoice: Pro
 type ProgressItem = { trick_id: string; status: string; progress: number; coach_note: string; tricks: { name: string; sort_order: number } | null };
 type Notice = { id: string; message: string; created_at: string; is_read: boolean };
 type CoachNote = { id: string; body: string; created_at: string };
+type NextSession = { skater_id: string; session_date: string; start_time: string; location: string; title: string };
 const labelStatus = (value: string) => value.replaceAll('_', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
 
 export default function Dashboard() {
@@ -20,6 +21,7 @@ export default function Dashboard() {
   const [trickProgress, setTrickProgress] = useState<ProgressItem[]>([]);
   const [notifications, setNotifications] = useState<Notice[]>([]);
   const [coachNote, setCoachNote] = useState<CoachNote | null>(null);
+  const [nextSession, setNextSession] = useState<NextSession | null>(null);
   const [toast, setToast] = useState('');
   const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent | null>(null);
   const [showInstallHelp, setShowInstallHelp] = useState(false);
@@ -32,18 +34,20 @@ export default function Dashboard() {
       if (!current) { router.replace('/auth/login'); return; }
       if (!active) return;
       setAccount(current);
-      const [{ data: progress }, { data: notices }, { data: latestNote }] = await Promise.all([
+      const [{ data: progress }, { data: notices }, { data: latestNote }, { data: upcomingSession }] = await Promise.all([
         supabase.from('skater_tricks').select('trick_id, status, progress, coach_note, tricks(name, sort_order)').eq('skater_id', current.skaterId),
         supabase.from('notifications').select('id, message, created_at, is_read').order('created_at', { ascending: false }).limit(6),
         supabase.from('skater_notes').select('id, body, created_at').eq('skater_id', current.skaterId).order('created_at', { ascending: false }).limit(1).maybeSingle(),
+        supabase.from('skater_next_sessions').select('skater_id,session_date,start_time,location,title').eq('skater_id', current.skaterId).maybeSingle(),
       ]);
       if (!active) return;
       setTrickProgress(((progress || []) as unknown as ProgressItem[]).sort((a, b) => (a.tricks?.sort_order || 0) - (b.tricks?.sort_order || 0)));
       setNotifications((notices || []) as Notice[]);
       setCoachNote((latestNote || null) as CoachNote | null);
+      setNextSession((upcomingSession || null) as NextSession | null);
     }
     void load();
-    const channel = supabase.channel('family-dashboard').on('postgres_changes', { event: '*', schema: 'public', table: 'skater_tricks' }, load).on('postgres_changes', { event: '*', schema: 'public', table: 'skater_notes' }, load).on('postgres_changes', { event: '*', schema: 'public', table: 'notifications' }, load).subscribe();
+    const channel = supabase.channel('family-dashboard').on('postgres_changes', { event: '*', schema: 'public', table: 'skater_tricks' }, load).on('postgres_changes', { event: '*', schema: 'public', table: 'skater_notes' }, load).on('postgres_changes', { event: '*', schema: 'public', table: 'skater_next_sessions' }, load).on('postgres_changes', { event: '*', schema: 'public', table: 'notifications' }, load).subscribe();
     const capturePrompt = (event: Event) => { event.preventDefault(); setInstallPrompt(event as InstallPromptEvent); };
     window.addEventListener('beforeinstallprompt', capturePrompt);
     return () => { active = false; window.removeEventListener('beforeinstallprompt', capturePrompt); supabase.removeChannel(channel); };
@@ -63,6 +67,10 @@ export default function Dashboard() {
   const overallProgress = trickProgress.length ? Math.round(trickProgress.reduce((sum, item) => sum + item.progress, 0) / trickProgress.length) : 0;
   const currentFocus = trickProgress.find((item) => item.status !== 'mastered' && item.progress < 100)?.tricks?.name || 'Keep rolling and building consistency';
   const checklistCoachNote = coachNote?.body || 'Your coach will add one overall checklist note after the next session.';
+  const sessionDate = nextSession ? new Date(nextSession.session_date + 'T12:00:00') : null;
+  const sessionDay = sessionDate ? sessionDate.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase() : 'TBD';
+  const sessionDateLabel = sessionDate ? sessionDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Not scheduled';
+  const sessionTime = nextSession ? new Date('1970-01-01T' + nextSession.start_time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : 'Set by your coach';
 
   return <main className="dashboard">
     <nav className="dash-nav"><Link href="/" className="brand-lockup"><span className="brand-mark">MSA</span><span><b>MIAMI SKATE</b><small>SKATER PORTAL</small></span></Link><div className="dash-user"><button className="install-nav-button" onClick={installApp}><Download size={16} /> Install app</button><span>{account.parentName}</span><button onClick={async () => { await signOut(); router.push('/'); }}>Sign out</button></div></nav>
@@ -70,6 +78,7 @@ export default function Dashboard() {
       <header className="dash-greeting"><div><p className="eyebrow"><span /> Family dashboard</p><h1>HEY, {account.parentName.split(' ')[0]}!</h1><p>Here&apos;s what&apos;s happening with {account.childName} at MSA.</p></div><a className="button button-small" href={'sms:+17863947314?body=' + encodeURIComponent('Hi JT, I would like to book a skate session for ' + account.childName + '.')}>Book a session</a></header>
       <section className="install-app-card"><div className="install-app-icon"><Smartphone /></div><div><small>NEW</small><b>Take the MSA portal with you</b><span>Install it on your home screen for quick access to every update.</span></div><button className="button button-small" onClick={installApp}><Download size={17} /> Install</button></section>
       <section className="dashboard-grid">
+        <div className="dash-card live-next-session"><h2>Next session</h2>{nextSession ? <div className="session-info"><div><div className="session-date">{sessionDay} {sessionDateLabel}</div><p>{sessionTime} · {nextSession.location}</p><b>{nextSession.title}</b></div><CheckCircle2 size={48} /></div> : <div className="session-empty"><p>Your coach has not scheduled the next session yet.</p><span>Check back here for the date, time, and location.</span></div>}</div>
         <div className="dash-card next-session"><h2>Next session</h2><div className="session-info"><div><div className="session-date">SAT 15</div><p>10:00 AM · Kendall Skatepark</p><b>MSA Member Session</b></div><CheckCircle2 size={48} /></div></div>
         <div className="dash-card"><h2>Skater profile</h2><p><b>{account.childName}</b></p><p className="muted">Active MSA member · All set</p><div className="profile-focus"><small>CURRENT FOCUS</small><b>{currentFocus}</b></div></div>
         <div className="dash-card progress-summary"><div className="card-heading-row"><div><small>MSA PROGRESSION</small><h2>Your path</h2></div><Trophy /></div><div className="summary-metrics"><div><b>{overallProgress}%</b><span>overall progress</span></div><div><b>{completedSkills}/{trickProgress.length || 0}</b><span>skills mastered</span></div></div><div className="summary-bar"><span style={{ width: overallProgress + '%' }} /></div><p className="muted">Your coach updates this roadmap after each session.</p></div>
