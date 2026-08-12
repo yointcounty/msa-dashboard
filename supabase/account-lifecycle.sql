@@ -33,3 +33,11 @@ revoke all on function public.delete_family_account(uuid) from public, anon, aut
 grant execute on function public.delete_family_account(uuid) to authenticated;
 
 insert into storage.buckets (id, name, public) values ('skater-media', 'skater-media', false) on conflict (id) do nothing;
+drop policy if exists "media_select_family_or_coach" on public.media;
+drop policy if exists "media_insert_coach" on public.media;
+drop policy if exists "media_update_coach" on public.media;
+drop policy if exists "media_delete_coach" on public.media;
+create policy "media_select_family_or_coach" on public.media for select to authenticated using (exists (select 1 from public.skaters s where s.id = media.skater_id and (s.parent_user_id = (select auth.uid()) or (select private.is_coach()))));
+create policy "media_insert_coach" on public.media for insert to authenticated with check ((select private.is_coach()));
+create policy "media_update_coach" on public.media for update to authenticated using ((select private.is_coach())) with check ((select private.is_coach()));
+create policy "media_delete_coach" on public.media for delete to authenticated using ((select private.is_coach()));
