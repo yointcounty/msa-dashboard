@@ -41,7 +41,6 @@ export default function LoginPage() {
           <button type="submit" className="primary-button auth-submit" disabled={loading}>{loading ? 'Signing in…' : 'Sign in'} <span>→</span></button>
         </form>
         <p className="auth-footer">New to the academy? <Link href="/auth/signup">Create an account</Link></p>
-        <Link href="/" className="back-link">← Back to portal</Link>
       </div>
     </div>
   );
