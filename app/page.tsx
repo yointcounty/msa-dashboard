@@ -51,7 +51,7 @@ export default function Home() {
           <div className="trust-row"><div className="avatar-stack"><span>JT</span><span>MSA</span><span>YC</span></div><p><b>100+ Enrolled Members</b><small>Growing stronger, one session at a time</small></p></div>
         </div>
         <div className="hero-media">
-          <Image src="/images/msa-coaching.webp" alt="Miami Skate Academy coaches and young skaters at the skatepark" fill priority sizes="(max-width: 900px) 100vw, 50vw"/>
+          <Image src="/images/msa-coaching-v2.png" alt="Miami Skate Academy coach helping a young skater at the skatepark" fill priority sizes="(max-width: 900px) 100vw, 50vw"/>
           <div className="hero-sticker"><Trophy size={24}/><b>SKATE.<br/>GROW.<br/>BELONG.</b></div>
           <div className="session-card"><span className="pulse"/><div><small>NEXT UP</small><b>Weekend Team Session</b><span>Saturday · 10:00 AM</span></div><CalendarDays size={24}/></div>
         </div>
@@ -68,7 +68,7 @@ export default function Home() {
       </section>
 
       <section className="family-section" id="families">
-        <div className="family-photo"><Image src="/images/msa-session.webp" alt="An MSA coach celebrating with a young skater" fill sizes="(max-width: 900px) 100vw, 48vw"/><div className="photo-caption"><Sparkles/><span><b>Real progress.</b><small>Celebrated together.</small></span></div></div>
+        <div className="family-photo"><Image src="/images/msa-session-v2.png" alt="An MSA coach celebrating with a young skater" fill sizes="(max-width: 900px) 100vw, 48vw"/><div className="photo-caption"><Sparkles/><span><b>Real progress.</b><small>Celebrated together.</small></span></div></div>
         <div className="family-copy"><p className="eyebrow"><span/> Built for busy families</p><h2>YOUR SKATER’S<br/>JOURNEY, <em>IN VIEW.</em></h2><p>The MSA Parent Portal keeps the details close and the progress clear, so you can spend less time chasing updates and more time cheering.</p>
           <ul><li><CalendarDays/><span><b>Session schedule</b><small>See what’s next and stay ready.</small></span></li><li><Trophy/><span><b>Progress milestones</b><small>Follow skills as they click.</small></span></li><li><ShieldCheck/><span><b>Coach updates</b><small>Stay connected after every session.</small></span></li></ul>
           <Link href={account ? '/dashboard' : '/auth/login'} className="button button-dark">{account ? 'Open skater profile' : 'Open parent portal'} <ArrowRight size={18}/></Link>
