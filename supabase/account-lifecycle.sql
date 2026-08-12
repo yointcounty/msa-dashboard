@@ -15,6 +15,8 @@ create table if not exists public.media (
 );
 alter table public.media enable row level security;
 grant select, insert, update, delete on public.media to authenticated;
+create index if not exists media_skater_id_idx on public.media(skater_id);
+create index if not exists media_created_by_idx on public.media(created_by);
 
 create or replace function public.delete_family_account(target_user_id uuid)
 returns void language plpgsql security definer set search_path = '' as $function$
@@ -41,3 +43,4 @@ create policy "media_select_family_or_coach" on public.media for select to authe
 create policy "media_insert_coach" on public.media for insert to authenticated with check ((select private.is_coach()));
 create policy "media_update_coach" on public.media for update to authenticated using ((select private.is_coach())) with check ((select private.is_coach()));
 create policy "media_delete_coach" on public.media for delete to authenticated using ((select private.is_coach()));
+
