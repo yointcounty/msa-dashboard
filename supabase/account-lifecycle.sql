@@ -16,13 +16,22 @@ create table if not exists public.media (
 
 create table if not exists public.skater_next_sessions (
   skater_id uuid primary key references public.skaters(id) on delete cascade,
-  session_date date not null,
+  session_date date,
+  weekly_day smallint not null default 6 check (weekly_day between 0 and 6),
   start_time time not null,
   location text not null,
   title text not null default 'MSA Member Session',
   updated_by uuid references public.profiles(id) on delete set null,
   updated_at timestamptz not null default now()
 );
+alter table public.skater_next_sessions add column if not exists weekly_day smallint;
+update public.skater_next_sessions set weekly_day = extract(dow from session_date)::smallint where weekly_day is null and session_date is not null;
+update public.skater_next_sessions set weekly_day = 6 where weekly_day is null;
+alter table public.skater_next_sessions alter column weekly_day set default 6;
+alter table public.skater_next_sessions alter column weekly_day set not null;
+alter table public.skater_next_sessions drop constraint if exists skater_next_sessions_weekly_day_check;
+alter table public.skater_next_sessions add constraint skater_next_sessions_weekly_day_check check (weekly_day between 0 and 6);
+alter table public.skater_next_sessions alter column session_date drop not null;
 alter table public.skater_next_sessions enable row level security;
 grant select, insert, update, delete on public.skater_next_sessions to authenticated;
 create index if not exists skater_next_sessions_date_idx on public.skater_next_sessions(session_date);

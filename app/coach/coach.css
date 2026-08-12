@@ -530,7 +530,8 @@
   text-transform: uppercase;
   letter-spacing: 0.7px;
 }
-.session-editor-fields input {
+.session-editor-fields input,
+.session-editor-fields select {
   min-width: 0;
   padding: 11px;
   border: 2px solid #aeb7af;

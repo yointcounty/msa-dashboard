@@ -37,7 +37,8 @@ type Progress = {
 };
 type NextSession = {
   skater_id: string;
-  session_date: string;
+  session_date: string | null;
+  weekly_day: number | null;
   start_time: string;
   location: string;
   title: string;
@@ -69,7 +70,7 @@ export default function CoachPortal() {
   const [nextSession, setNextSession] = useState<NextSession | null>(null);
   const [addonSessions, setAddonSessions] = useState<AddonSession[]>([]);
   const [sessionDraft, setSessionDraft] = useState({
-    session_date: "",
+    weekly_day: "",
     start_time: "",
     location: "",
     title: "MSA Member Session",
@@ -168,7 +169,7 @@ export default function CoachPortal() {
         .maybeSingle(),
       supabase
         .from("skater_next_sessions")
-        .select("skater_id,session_date,start_time,location,title")
+        .select("skater_id,session_date,weekly_day,start_time,location,title")
         .eq("skater_id", selected)
         .maybeSingle(),
       supabase
@@ -191,13 +192,18 @@ export default function CoachPortal() {
     setSessionDraft(
       currentSession
         ? {
-            session_date: currentSession.session_date,
+            weekly_day: String(
+              currentSession.weekly_day ??
+                (currentSession.session_date
+                  ? new Date(currentSession.session_date + "T12:00:00").getDay()
+                  : ""),
+            ),
             start_time: currentSession.start_time.slice(0, 5),
             location: currentSession.location,
             title: currentSession.title,
           }
         : {
-            session_date: "",
+            weekly_day: "",
             start_time: "",
             location: "",
             title: "MSA Member Session",
@@ -355,11 +361,11 @@ export default function CoachPortal() {
   async function saveNextSession() {
     if (
       !selected ||
-      !sessionDraft.session_date ||
+      sessionDraft.weekly_day === "" ||
       !sessionDraft.start_time ||
       !sessionDraft.location.trim()
     ) {
-      setMessage("Add the session date, time, and location before saving.");
+      setMessage("Choose the weekly day, time, and location before saving.");
       return;
     }
     setBusy(true);
@@ -369,7 +375,8 @@ export default function CoachPortal() {
       .upsert(
         {
           skater_id: selected,
-          session_date: sessionDraft.session_date,
+          session_date: null,
+          weekly_day: Number(sessionDraft.weekly_day),
           start_time: sessionDraft.start_time,
           location: sessionDraft.location.trim(),
           title: sessionDraft.title.trim() || "MSA Member Session",
@@ -378,7 +385,7 @@ export default function CoachPortal() {
         },
         { onConflict: "skater_id" },
       )
-      .select("skater_id,session_date,start_time,location,title")
+      .select("skater_id,session_date,weekly_day,start_time,location,title")
       .single();
     setBusy(false);
     if (error) {
@@ -482,7 +489,7 @@ export default function CoachPortal() {
     }
     setNextSession(null);
     setSessionDraft({
-      session_date: "",
+      weekly_day: "",
       start_time: "",
       location: "",
       title: "MSA Member Session",
@@ -903,17 +910,25 @@ export default function CoachPortal() {
                   />
                 </label>
                 <label>
-                  Date
-                  <input
-                    type="date"
-                    value={sessionDraft.session_date}
+                  Weekly day
+                  <select
+                    value={sessionDraft.weekly_day}
                     onChange={(event) =>
                       setSessionDraft((draft) => ({
                         ...draft,
-                        session_date: event.target.value,
+                        weekly_day: event.target.value,
                       }))
                     }
-                  />
+                  >
+                    <option value="">Choose a day</option>
+                    <option value="0">Sunday</option>
+                    <option value="1">Monday</option>
+                    <option value="2">Tuesday</option>
+                    <option value="3">Wednesday</option>
+                    <option value="4">Thursday</option>
+                    <option value="5">Friday</option>
+                    <option value="6">Saturday</option>
+                  </select>
                 </label>
                 <label>
                   Time

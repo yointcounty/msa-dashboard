@@ -41,7 +41,8 @@ type Notice = {
 type CoachNote = { id: string; body: string; created_at: string };
 type NextSession = {
   skater_id: string;
-  session_date: string;
+  session_date: string | null;
+  weekly_day: number | null;
   start_time: string;
   location: string;
   title: string;
@@ -56,6 +57,19 @@ type AddonSession = {
 };
 const labelStatus = (value: string) =>
   value.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+const weekDays = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+const weeklyDayLabel = (day: number | null) =>
+  day === null || day === undefined
+    ? "Weekly day"
+    : weekDays[day] || "Weekly day";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -111,7 +125,7 @@ export default function Dashboard() {
           .maybeSingle(),
         supabase
           .from("skater_next_sessions")
-          .select("skater_id,session_date,start_time,location,title")
+          .select("skater_id,session_date,weekly_day,start_time,location,title")
           .eq("skater_id", current.skaterId)
           .maybeSingle(),
         supabase
@@ -204,11 +218,22 @@ export default function Dashboard() {
       notify("Your coach has not scheduled the next session yet.");
       return;
     }
-    const start = new Date(
-      `${nextSession.session_date}T${nextSession.start_time}`,
-    );
-    const end = new Date(start.getTime() + 60 * 60 * 1000);
     const pad = (value: number) => String(value).padStart(2, "0");
+    const sessionDate =
+      nextSession.weekly_day === null || nextSession.weekly_day === undefined
+        ? nextSession.session_date
+        : (() => {
+            const date = new Date();
+            const daysUntil = (nextSession.weekly_day - date.getDay() + 7) % 7;
+            date.setDate(date.getDate() + daysUntil);
+            return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+          })();
+    if (!sessionDate) {
+      notify("Your coach has not finished setting the primary session.");
+      return;
+    }
+    const start = new Date(`${sessionDate}T${nextSession.start_time}`);
+    const end = new Date(start.getTime() + 60 * 60 * 1000);
     const toIcsLocal = (date: Date) =>
       `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}T${pad(date.getHours())}${pad(date.getMinutes())}00`;
     const stamp = new Date()
@@ -220,7 +245,7 @@ export default function Dashboard() {
       "VERSION:2.0",
       "PRODID:-//Miami Skate Academy//Skater Portal//EN",
       "BEGIN:VEVENT",
-      `UID:msa-${nextSession.skater_id}-${nextSession.session_date}-${nextSession.start_time}@miamiskateacademy.com`,
+      `UID:msa-${nextSession.skater_id}-${sessionDate}-${nextSession.start_time}@miamiskateacademy.com`,
       `DTSTAMP:${stamp}`,
       `DTSTART:${toIcsLocal(start)}`,
       `DTEND:${toIcsLocal(end)}`,
@@ -235,7 +260,7 @@ export default function Dashboard() {
     );
     const link = document.createElement("a");
     link.href = url;
-    link.download = `msa-${nextSession.session_date}-session.ics`;
+    link.download = `msa-${sessionDate}-primary-session.ics`;
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -266,20 +291,9 @@ export default function Dashboard() {
   const checklistCoachNote =
     coachNote?.body ||
     "Your coach will add one overall checklist note after the next session.";
-  const sessionDate = nextSession
-    ? new Date(nextSession.session_date + "T12:00:00")
-    : null;
-  const sessionDay = sessionDate
-    ? sessionDate
-        .toLocaleDateString("en-US", { weekday: "short" })
-        .toUpperCase()
+  const sessionDay = nextSession
+    ? weeklyDayLabel(nextSession.weekly_day).toUpperCase()
     : "TBD";
-  const sessionDateLabel = sessionDate
-    ? sessionDate.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-      })
-    : "Not scheduled";
   const sessionTime = nextSession
     ? new Date("1970-01-01T" + nextSession.start_time).toLocaleTimeString(
         "en-US",
@@ -367,7 +381,7 @@ export default function Dashboard() {
                 <div className="session-info">
                   <div>
                     <div className="session-date">
-                      {sessionDay} {sessionDateLabel}
+                      {sessionDay} · EVERY WEEK
                     </div>
                     <p>
                       {sessionTime} · {nextSession.location}
@@ -380,7 +394,7 @@ export default function Dashboard() {
             ) : (
               <div className="session-empty">
                 <p>Your primary session is not scheduled yet.</p>
-                <span>Check back here for the date, time, and location.</span>
+                <span>Check back here for the weekly day, time, and location.</span>
               </div>
             )}
             {addonSessions.length > 0 && (

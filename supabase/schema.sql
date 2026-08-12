@@ -69,7 +69,8 @@ create table if not exists public.media (
 );
 create table if not exists public.skater_next_sessions (
   skater_id uuid primary key references public.skaters(id) on delete cascade,
-  session_date date not null,
+  session_date date,
+  weekly_day smallint not null default 6 check (weekly_day between 0 and 6),
   start_time time not null,
   location text not null,
   title text not null default 'MSA Member Session',
