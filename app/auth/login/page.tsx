@@ -45,13 +45,18 @@ export default function LoginPage() {
         />
         <div className="auth-visual-copy">
           <h2>
-            WELCOME BACK
+            WELCOME BACK.
             <br />
-            <em>TO THE CREW.</em>
+            <em>YOUR PROGRESS.</em>
           </h2>
           <p>
+            {/*
             Schedules, milestones, and coach updates—all in one family-friendly
-            place.
+            Keep up with schedules, milestones, and coach updates—all in one
+            family-friendly place.
+            */}
+            Keep up with schedules, milestones, and coach updates - all in one
+            family-friendly place.
           </p>
         </div>
       </section>
@@ -71,7 +76,10 @@ export default function LoginPage() {
             <span /> Parent portal
           </p>
           <h1>SIGN IN.</h1>
-          <p>Pick up right where your skater left off.</p>
+          <p>
+            See what&apos;s next, celebrate every win, and pick up right where
+            your skater left off.
+          </p>
           <form onSubmit={submit}>
             <div className="field">
               <label htmlFor="email">Parent email</label>
@@ -108,7 +116,13 @@ export default function LoginPage() {
             )}
             <button className="button" disabled={busy}>
               {busy ? (
+                /*
                 "Signing in…"
+                */
+                /*
+                "Signing you in…"
+                */
+                "Signing you in..."
               ) : (
                 <>
                   Sign in <ArrowRight size={18} />
@@ -117,14 +131,13 @@ export default function LoginPage() {
             </button>
           </form>
           <p className="auth-switch">
-            Enrolled but new to the portal?{" "}
-            <Link href="/auth/signup">Activate access</Link>
+            Already enrolled? <Link href="/auth/signup">Activate access</Link>
           </p>
           <p className="auth-switch">
-            MSA coach? <Link href="/coach">Open coach portal</Link>
+            Are you an MSA coach? <Link href="/coach">Open coach portal</Link>
           </p>
           <div className="not-enrolled">
-            <b>Not enrolled yet?</b>
+            <b>New to Miami Skate Academy?</b>
             <a
               href="https://miamiskateacademy.com"
               target="_blank"

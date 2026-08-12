@@ -39,7 +39,7 @@
 .coach-main h1 {
   font-family: Impact, sans-serif;
   font-size: clamp(60px, 8vw, 120px);
-  line-height: 0.85;
+  line-height: 1;
   margin: 35px 0;
 }
 .coach-auth h1 em {

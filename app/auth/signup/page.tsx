@@ -80,8 +80,8 @@ export default function SignupPage() {
           </p>
           <h1>ACTIVATE.</h1>
           <p>
-            Create private portal access for an already-enrolled MSA skater.
-            There are no programs to choose or purchase here.
+            Create private access for your enrolled skater and keep every
+            session, milestone, and coach update in one place.
           </p>
           <form onSubmit={submit}>
             <div className="form-grid">
@@ -144,7 +144,10 @@ export default function SignupPage() {
             )}
             <button className="button" disabled={busy}>
               {busy ? (
-                "Activating..."
+                /*
+                "Activating your portal…"
+                */
+                "Activating your portal..."
               ) : (
                 <>
                   Activate portal <ArrowRight size={18} />
@@ -153,10 +156,10 @@ export default function SignupPage() {
             </button>
           </form>
           <p className="auth-switch">
-            Already activated? <Link href="/auth/login">Sign in</Link>
+            Already have access? <Link href="/auth/login">Sign in</Link>
           </p>
           <div className="not-enrolled">
-            <b>Not enrolled yet?</b>
+            <b>New to Miami Skate Academy?</b>
             <a
               href="https://miamiskateacademy.com"
               target="_blank"
