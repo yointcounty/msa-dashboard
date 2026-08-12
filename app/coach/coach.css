@@ -412,6 +412,36 @@
 .media-upload input {
   display: none;
 }
+.coach-media-gallery {
+  grid-column: 1/-1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+.coach-media-gallery figure {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid #d4dbd3;
+  background: #f4f7f2;
+}
+.coach-media-gallery img,
+.coach-media-gallery video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  background: #dfe7df;
+}
+.coach-media-gallery figcaption {
+  overflow: hidden;
+  padding: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 800;
+}
 .account-controls {
   margin: 22px 0;
   background: #fff;
@@ -450,6 +480,9 @@
   .coach-note-panel,
   .media-panel {
     grid-template-columns: 1fr;
+  }
+  .coach-media-gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .account-controls {
     align-items: flex-start;

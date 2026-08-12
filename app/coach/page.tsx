@@ -54,6 +54,14 @@ type AddonSession = {
   title: string;
   status: string;
 };
+type CoachMedia = {
+  id: string;
+  storage_path: string;
+  kind: "photo" | "video";
+  caption: string | null;
+  created_at: string;
+  url: string;
+};
 const weekDays = [
   "Sunday",
   "Monday",
@@ -72,6 +80,7 @@ export default function CoachPortal() {
   const [busy, setBusy] = useState(false);
   const [savingAll, setSavingAll] = useState(false);
   const [mediaBusy, setMediaBusy] = useState(false);
+  const [mediaItems, setMediaItems] = useState<CoachMedia[]>([]);
   const [coachId, setCoachId] = useState("");
   const [skaters, setSkaters] = useState<Skater[]>([]);
   const [families, setFamilies] = useState<Family[]>([]);
@@ -260,6 +269,34 @@ export default function CoachPortal() {
     );
   }, [selected]);
 
+  const loadMedia = useCallback(async () => {
+    if (!selected) {
+      setMediaItems([]);
+      return;
+    }
+    const { data, error } = await supabase
+      .from("media")
+      .select("id,storage_path,kind,caption,created_at")
+      .eq("skater_id", selected)
+      .order("created_at", { ascending: false })
+      .limit(12);
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+    const signed = await Promise.all(
+      ((data || []) as Array<Omit<CoachMedia, "url">>).map(async (item) => {
+        const { data: signedData } = await supabase.storage
+          .from("skater-media")
+          .createSignedUrl(item.storage_path, 60 * 60);
+        return signedData?.signedUrl
+          ? { ...item, url: signedData.signedUrl }
+          : null;
+      }),
+    );
+    setMediaItems(signed.filter((item): item is CoachMedia => item !== null));
+  }, [selected]);
+
   useEffect(() => {
     const timer = window.setTimeout(() => {
       void loadSkaters();
@@ -272,6 +309,12 @@ export default function CoachPortal() {
     }, 0);
     return () => window.clearTimeout(timer);
   }, [loadProgress]);
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      void loadMedia();
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [loadMedia]);
 
   async function authenticate(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -424,6 +467,7 @@ export default function CoachPortal() {
     if (mediaError) {
       await supabase.storage.from("skater-media").remove([path]);
     }
+    if (!mediaError) await loadMedia();
     setMediaBusy(false);
     setMessage(
       mediaError
@@ -1418,6 +1462,23 @@ export default function CoachPortal() {
                   onChange={uploadMedia}
                 />
               </label>
+              {mediaItems.length > 0 && (
+                <div className="coach-media-gallery" aria-label="Saved media">
+                  {mediaItems.map((item) => (
+                    <figure key={item.id}>
+                      {item.kind === "video" ? (
+                        <video src={item.url} controls preload="metadata" />
+                      ) : (
+                        <img
+                          src={item.url}
+                          alt={item.caption || "Saved MSA session photo"}
+                        />
+                      )}
+                      <figcaption>{item.caption || "MSA session"}</figcaption>
+                    </figure>
+                  ))}
+                </div>
+              )}
             </section>
             <section className="coach-tricks">
               <div className="coach-section-title">
