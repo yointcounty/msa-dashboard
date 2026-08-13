@@ -9,22 +9,65 @@ export type ParentAccount = {
   role: 'family' | 'coach';
 };
 
+function friendlyAuthError(error: unknown, fallback: string) {
+  const message = error instanceof Error ? error.message : String(error ?? '');
+  const normalized = message.toLowerCase();
+
+  if (normalized.includes('already registered') || normalized.includes('user already')) {
+    return 'This email already has a portal account. Sign in instead, or use a different email.';
+  }
+  if (normalized.includes('password') && (normalized.includes('character') || normalized.includes('should be'))) {
+    return 'Choose a password with at least 8 characters.';
+  }
+  if (
+    normalized.includes('failed to fetch') ||
+    normalized.includes('load failed') ||
+    normalized.includes('networkerror') ||
+    normalized.includes('network error')
+  ) {
+    return 'We could not reach the portal. Check your internet connection and try again.';
+  }
+  if (normalized.includes('rate limit') || normalized.includes('email rate')) {
+    return 'Too many sign-up emails were requested. Please wait a few minutes and try again.';
+  }
+  return fallback;
+}
+
 export async function createAccount(account: { parentName: string; email: string; childName: string; password: string }) {
-  const { data, error } = await supabase.auth.signUp({
-    email: account.email.toLowerCase(),
-    password: account.password,
-    options: { emailRedirectTo: `${window.location.origin}/auth/login`, data: { parent_name: account.parentName, child_name: account.childName } },
-  });
-  if (error) throw error;
-  return { needsConfirmation: !data.session };
+  const parentName = account.parentName.trim();
+  const childName = account.childName.trim();
+  const email = account.email.trim().toLowerCase();
+
+  if (!parentName || !childName) throw new Error('Enter the parent and skater names.');
+  if (!email || !email.includes('@')) throw new Error('Enter a valid parent email.');
+  if (account.password.length < 8) throw new Error('Choose a password with at least 8 characters.');
+
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password: account.password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/login`,
+        data: { parent_name: parentName, child_name: childName },
+      },
+    });
+    if (error) throw error;
+    return { needsConfirmation: !data.session };
+  } catch (error) {
+    throw new Error(friendlyAuthError(error, 'We could not activate the portal. Please check your details and try again.'));
+  }
 }
 
 export async function signIn(email: string, password: string) {
-  const { data, error } = await supabase.auth.signInWithPassword({ email: email.toLowerCase(), password });
-  if (error) throw error;
-  const { data: profile, error: profileError } = await supabase.from('profiles').select('role').eq('id', data.user.id).single();
-  if (profileError) throw profileError;
-  return profile as { role: 'family' | 'coach' };
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password });
+    if (error) throw error;
+    const { data: profile, error: profileError } = await supabase.from('profiles').select('role').eq('id', data.user.id).single();
+    if (profileError) throw profileError;
+    return profile as { role: 'family' | 'coach' };
+  } catch (error) {
+    throw new Error(friendlyAuthError(error, 'We could not sign you in. Check your email and password and try again.'));
+  }
 }
 
 export async function getAccount(): Promise<ParentAccount | null> {

@@ -107,6 +107,8 @@ export default function SignupPage() {
                 type="email"
                 required
                 autoComplete="email"
+                autoCapitalize="none"
+                spellCheck={false}
               />
             </div>
             <div className="form-grid">
@@ -120,6 +122,7 @@ export default function SignupPage() {
                   required
                   autoComplete="new-password"
                 />
+                <small className="field-hint">Use at least 8 characters.</small>
               </div>
               <div className="field">
                 <label htmlFor="confirm">Confirm password</label>

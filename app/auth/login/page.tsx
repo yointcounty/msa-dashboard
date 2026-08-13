@@ -90,6 +90,8 @@ export default function LoginPage() {
                 autoComplete="email"
                 required
                 placeholder="you@example.com"
+                autoCapitalize="none"
+                spellCheck={false}
               />
             </div>
             <div className="field">
