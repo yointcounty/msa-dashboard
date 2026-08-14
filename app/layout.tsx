@@ -39,8 +39,8 @@ export const metadata: Metadata = {
       "Private trick progress, coach updates, milestones, and schedules for enrolled Miami Skate Academy families.",
     images: [
       {
-        url: "/images/msa-real-family.jpg",
-        alt: "Miami Skate Academy skaters and families",
+        url: "/images/msa-real-hero.jpg",
+        alt: "Miami Skate Academy coaching and skater experiences",
       },
     ],
   },
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     title: "Miami Skate Academy | Private Skater Portal",
     description:
       "Private trick progress, coach updates, milestones, and schedules for enrolled Miami Skate Academy families.",
-    images: ["/images/msa-real-family.jpg"],
+    images: ["/images/msa-real-hero.jpg"],
   },
 };
 
