@@ -145,7 +145,7 @@ export default function Home() {
             <em>ALL HERE.</em>
           </h1>
           <p className="hero-lede">
-            A private home for enrolled MSA skaters and Rad Families to follow
+            A private home for enrolled MSA skaters and families to follow
             tricks, coach updates, milestones, and upcoming sessions.
           </p>
           <div className="hero-actions">
@@ -165,7 +165,7 @@ export default function Home() {
               <span>YC</span>
             </div>
             <p>
-              <b>Helped 1,000+ Skaters Learn to Skate</b>
+              <b>Teaching the Art of Skateboarding Is Our Passion</b>
               <small>Growing stronger, one session at a time</small>
             </p>
           </div>
@@ -202,8 +202,8 @@ export default function Home() {
 
       <section className="proof-strip" aria-label="Academy highlights">
         <div>
-          <strong>1,000+</strong>
-          <span>SKATERS HELPED LEARN TO SKATE</span>
+          <strong>PASSION</strong>
+          <span>TEACHING THE ART OF SKATEBOARDING</span>
         </div>
         <div>
           <strong>2–5</strong>
@@ -231,8 +231,8 @@ export default function Home() {
       >
         <div style={{ position: "relative", minHeight: 360, overflow: "hidden" }}>
           <Image
-            src="/images/msa-home-1.jpg"
-            alt="Miami Skate Academy skater practicing at the skatepark"
+            src="/images/msa-real-login.jpg"
+            alt="Miami Skate Academy skater at the skatepark"
             fill
             sizes="(max-width: 700px) 50vw, 50vw"
             style={{ objectFit: "cover" }}
@@ -240,8 +240,8 @@ export default function Home() {
         </div>
         <div style={{ position: "relative", minHeight: 360, overflow: "hidden" }}>
           <Image
-            src="/images/msa-home-2.jpg"
-            alt="Young Miami Skate Academy skater with skateboard"
+            src="/images/msa-real-family.jpg"
+            alt="Miami Skate Academy skaters together at the skatepark"
             fill
             sizes="(max-width: 700px) 50vw, 50vw"
             style={{ objectFit: "cover" }}
@@ -396,7 +396,7 @@ export default function Home() {
         </div>
         <div className="family-copy">
           <p className="eyebrow">
-            <span /> Built for Rad Moms, Rad Dads &amp; Rad Families
+            <span /> Built for busy families
           </p>
           <h2>
             YOUR SKATER’S
@@ -405,8 +405,8 @@ export default function Home() {
           </h2>
           <p>
             The MSA Parent Portal keeps the details close and the progress
-            clear, so every Rad Family can spend less time chasing updates and
-            more time cheering.
+            clear, so every family can spend less time chasing updates and more
+            time cheering.
           </p>
           <ul>
             <li>
@@ -444,10 +444,10 @@ export default function Home() {
       <section className="section faq-section" id="faq">
         <div>
           <p className="eyebrow">
-            <span /> Good to know for every Rad Family
+            <span /> Good to know
           </p>
           <h2>
-            RAD FAMILY
+            FAMILY
             <br />
             <em>QUESTIONS.</em>
           </h2>
