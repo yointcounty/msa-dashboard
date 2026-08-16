@@ -39,7 +39,7 @@
   padding-bottom: 8px;
 }
 
-/* Rotating MSA skater photography stays behind the auth content so forms remain clear. */
+/* Real MSA photo-bank carousel stays visible across auth screens; readability is protected by the form card itself. */
 .auth-panel,
 .auth-visual {
   position: relative;
@@ -56,22 +56,22 @@
   object-fit: cover;
   object-position: center;
   opacity: 0;
-  transition: opacity 650ms ease;
+  transition: opacity 700ms ease;
 }
 .auth-photo-carousel img.active {
-  opacity: 0.18;
+  opacity: 0.58;
 }
 .auth-photo-wash {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: rgba(247, 246, 239, 0.7);
+  background: linear-gradient(180deg, rgba(247, 246, 239, 0.12), rgba(247, 246, 239, 0.24));
 }
 .auth-visual .auth-photo-carousel img.active {
-  opacity: 0.72;
+  opacity: 0.88;
 }
 .auth-visual .auth-photo-wash {
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.14), rgba(0, 0, 0, 0.68));
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.62));
 }
 .auth-panel > :not(.auth-photo-carousel),
 .auth-visual > :not(.auth-photo-carousel) {
@@ -80,8 +80,11 @@
 }
 .auth-card {
   padding: 22px;
-  background: rgba(247, 246, 239, 0.88);
-  backdrop-filter: blur(2px);
+  background: rgba(247, 246, 239, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  box-shadow: 0 20px 55px rgba(0, 0, 0, 0.14);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
 }
 .auth-panel .brand-lockup,
 .auth-panel .back-link {
@@ -89,12 +92,13 @@
 }
 @media (max-width: 560px) {
   .auth-photo-carousel img.active {
-    opacity: 0.14;
+    opacity: 0.5;
   }
   .auth-photo-wash {
-    background: rgba(247, 246, 239, 0.74);
+    background: linear-gradient(180deg, rgba(247, 246, 239, 0.18), rgba(247, 246, 239, 0.3));
   }
   .auth-card {
     padding: 18px;
+    background: rgba(247, 246, 239, 0.97);
   }
 }
