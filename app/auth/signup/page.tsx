@@ -44,6 +44,7 @@ export default function SignupPage() {
   return (
     <main className="auth-shell">
       <section className="auth-visual">
+        <AuthPhotoCarousel />
         <div className="auth-visual-copy">
           <h2>
             YOUR CREW.
