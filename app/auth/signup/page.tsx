@@ -1,10 +1,10 @@
 "use client";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { createAccount } from "../../lib/auth";
+import AuthPhotoCarousel from "../photo-carousel";
 import "../auth.css";
 
 export default function SignupPage() {
@@ -44,13 +44,6 @@ export default function SignupPage() {
   return (
     <main className="auth-shell">
       <section className="auth-visual">
-        <Image
-          src="/images/msa-real-login.jpg"
-          alt="Miami Skate Academy skaters and coaches"
-          fill
-          priority
-          sizes="(max-width: 900px) 100vw, 50vw"
-        />
         <div className="auth-visual-copy">
           <h2>
             YOUR CREW.
@@ -64,6 +57,7 @@ export default function SignupPage() {
         </div>
       </section>
       <section className="auth-panel">
+        <AuthPhotoCarousel />
         <Link href="/" className="brand-lockup">
           <span className="brand-mark">MSA</span>
           <span>
@@ -147,9 +141,6 @@ export default function SignupPage() {
             )}
             <button className="button" disabled={busy}>
               {busy ? (
-                /*
-                "Activating your portal…"
-                */
                 "Activating your portal..."
               ) : (
                 <>
