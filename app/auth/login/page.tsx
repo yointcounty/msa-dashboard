@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { getAccount, signIn } from "../../lib/auth";
+import AuthPhotoCarousel from "../photo-carousel";
 import "../auth.css";
 
 export default function LoginPage() {
@@ -50,17 +51,13 @@ export default function LoginPage() {
             <em>YOUR PROGRESS.</em>
           </h2>
           <p>
-            {/*
-            Schedules, milestones, and coach updates—all in one family-friendly
-            Keep up with schedules, milestones, and coach updates—all in one
-            family-friendly place.
-            */}
             Keep up with schedules, milestones, and coach updates in one
             family-friendly place.
           </p>
         </div>
       </section>
       <section className="auth-panel">
+        <AuthPhotoCarousel />
         <Link href="/" className="brand-lockup">
           <span className="brand-mark">MSA</span>
           <span>
@@ -118,12 +115,6 @@ export default function LoginPage() {
             )}
             <button className="button" disabled={busy}>
               {busy ? (
-                /*
-                "Signing in…"
-                */
-                /*
-                "Signing you in…"
-                */
                 "Signing you in..."
               ) : (
                 <>
