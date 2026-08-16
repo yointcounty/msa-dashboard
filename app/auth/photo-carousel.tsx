@@ -3,13 +3,11 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
+// Only approved real MSA photo-bank images belong in rotating website carousels.
 const photos = [
   "/images/msa-real-login.jpg",
   "/images/msa-real-hero.jpg",
   "/images/msa-real-family.jpg",
-  "/images/msa-coaching-v2.png",
-  "/images/msa-session-v2.png",
-  "/images/msa-lessons-v2.png",
 ];
 
 export default function AuthPhotoCarousel() {
@@ -18,7 +16,7 @@ export default function AuthPhotoCarousel() {
   useEffect(() => {
     const timer = window.setInterval(() => {
       setActive((current) => (current + 1) % photos.length);
-    }, 2000);
+    }, 3000);
     return () => window.clearInterval(timer);
   }, []);
 
