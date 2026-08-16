@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import "./home-photo-carousel.css";
 import PwaRegister from "./pwa-register";
 
 const geistSans = Geist({
