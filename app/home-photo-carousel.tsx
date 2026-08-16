@@ -3,18 +3,17 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
+// Only approved real MSA photo-bank images belong in rotating website carousels.
 const leftPhotos = [
   "/images/msa-real-login.jpg",
   "/images/msa-real-hero.jpg",
-  "/images/msa-coaching-v2.png",
-  "/images/msa-lessons-v2.png",
+  "/images/msa-real-family.jpg",
 ];
 
 const rightPhotos = [
   "/images/msa-real-family.jpg",
-  "/images/msa-session-v2.png",
-  "/images/msa-lessons-v2.png",
-  "/images/msa-coaching-v2.png",
+  "/images/msa-real-login.jpg",
+  "/images/msa-real-hero.jpg",
 ];
 
 export default function HomePhotoCarousel() {
@@ -23,7 +22,7 @@ export default function HomePhotoCarousel() {
   useEffect(() => {
     const timer = window.setInterval(() => {
       setActive((current) => (current + 1) % leftPhotos.length);
-    }, 2000);
+    }, 3000);
     return () => window.clearInterval(timer);
   }, []);
 
