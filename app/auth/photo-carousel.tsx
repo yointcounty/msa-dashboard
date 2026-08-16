@@ -7,6 +7,9 @@ const photos = [
   "/images/msa-real-login.jpg",
   "/images/msa-real-hero.jpg",
   "/images/msa-real-family.jpg",
+  "/images/msa-coaching-v2.png",
+  "/images/msa-session-v2.png",
+  "/images/msa-lessons-v2.png",
 ];
 
 export default function AuthPhotoCarousel() {
@@ -28,7 +31,7 @@ export default function AuthPhotoCarousel() {
           alt=""
           fill
           priority={index === 0}
-          sizes="(max-width: 900px) 100vw, 50vw"
+          sizes="100vw"
           className={index === active ? "active" : ""}
         />
       ))}
