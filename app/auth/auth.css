@@ -67,6 +67,12 @@
   z-index: 1;
   background: rgba(247, 246, 239, 0.7);
 }
+.auth-visual .auth-photo-carousel img.active {
+  opacity: 0.72;
+}
+.auth-visual .auth-photo-wash {
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.14), rgba(0, 0, 0, 0.68));
+}
 .auth-panel > :not(.auth-photo-carousel),
 .auth-visual > :not(.auth-photo-carousel) {
   position: relative;
