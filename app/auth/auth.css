@@ -39,7 +39,7 @@
   padding-bottom: 8px;
 }
 
-/* Rotating MSA skater photography stays behind the auth content so forms remain clear. */
+/* Rotating real MSA photo-bank photography stays visible behind auth content while forms remain clear. */
 .auth-panel,
 .auth-visual {
   position: relative;
@@ -59,19 +59,19 @@
   transition: opacity 650ms ease;
 }
 .auth-photo-carousel img.active {
-  opacity: 0.18;
+  opacity: 0.32;
 }
 .auth-photo-wash {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: rgba(247, 246, 239, 0.7);
+  background: rgba(247, 246, 239, 0.56);
 }
 .auth-visual .auth-photo-carousel img.active {
-  opacity: 0.72;
+  opacity: 0.78;
 }
 .auth-visual .auth-photo-wash {
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.14), rgba(0, 0, 0, 0.68));
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.58));
 }
 .auth-panel > :not(.auth-photo-carousel),
 .auth-visual > :not(.auth-photo-carousel) {
@@ -80,7 +80,7 @@
 }
 .auth-card {
   padding: 22px;
-  background: rgba(247, 246, 239, 0.88);
+  background: rgba(247, 246, 239, 0.86);
   backdrop-filter: blur(2px);
 }
 .auth-panel .brand-lockup,
@@ -89,10 +89,10 @@
 }
 @media (max-width: 560px) {
   .auth-photo-carousel img.active {
-    opacity: 0.14;
+    opacity: 0.28;
   }
   .auth-photo-wash {
-    background: rgba(247, 246, 239, 0.74);
+    background: rgba(247, 246, 239, 0.6);
   }
   .auth-card {
     padding: 18px;
