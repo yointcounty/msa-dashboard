@@ -1,0 +1,48 @@
+/* Homepage two-photo MSA gallery: both panels rotate together every 2 seconds. */
+[aria-label="Miami Skate Academy skaters"] > div {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+[aria-label="Miami Skate Academy skaters"] > div > img {
+  opacity: 0;
+}
+
+[aria-label="Miami Skate Academy skaters"] > div:first-child {
+  animation: msa-home-left-carousel 12s steps(1, end) infinite;
+}
+
+[aria-label="Miami Skate Academy skaters"] > div:nth-child(2) {
+  animation: msa-home-right-carousel 12s steps(1, end) infinite;
+}
+
+@keyframes msa-home-left-carousel {
+  0%, 16.65% { background-image: url('/images/msa-real-login.jpg'); }
+  16.66%, 33.31% { background-image: url('/images/msa-coaching-v2.png'); }
+  33.32%, 49.97% { background-image: url('/images/msa-real-hero.jpg'); }
+  49.98%, 66.63% { background-image: url('/images/msa-session-v2.png'); }
+  66.64%, 83.29% { background-image: url('/images/msa-lessons-v2.png'); }
+  83.30%, 100% { background-image: url('/images/msa-real-family.jpg'); }
+}
+
+@keyframes msa-home-right-carousel {
+  0%, 16.65% { background-image: url('/images/msa-real-family.jpg'); }
+  16.66%, 33.31% { background-image: url('/images/msa-session-v2.png'); }
+  33.32%, 49.97% { background-image: url('/images/msa-lessons-v2.png'); }
+  49.98%, 66.63% { background-image: url('/images/msa-real-login.jpg'); }
+  66.64%, 83.29% { background-image: url('/images/msa-coaching-v2.png'); }
+  83.30%, 100% { background-image: url('/images/msa-real-hero.jpg'); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [aria-label="Miami Skate Academy skaters"] > div {
+    animation: none !important;
+  }
+  [aria-label="Miami Skate Academy skaters"] > div:first-child {
+    background-image: url('/images/msa-real-login.jpg');
+  }
+  [aria-label="Miami Skate Academy skaters"] > div:nth-child(2) {
+    background-image: url('/images/msa-real-family.jpg');
+  }
+}
