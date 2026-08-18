@@ -97,11 +97,13 @@ insert into public.tricks (name, sort_order, category) values
   ('Step Off Safely', 75, 'super_beginner'),
   ('Two-Foot Landing', 76, 'super_beginner'),
   ('Flip Board & Land', 77, 'super_beginner'),
-  ('Jump On Board (Small Surface)', 78, 'super_beginner')
+  ('Jump On Board (Small Surface)', 78, 'super_beginner'),
+  ('Wall Ride', 220, 'core'),
+  ('Fakie Ollie', 230, 'core')
 on conflict (name) do nothing;
 insert into public.skater_tricks (skater_id, trick_id)
 select s.id, t.id from public.skaters s cross join public.tricks t
-where s.active = true and t.name in ('Step Off Safely', 'Two-Foot Landing', 'Flip Board & Land', 'Jump On Board (Small Surface)')
+where s.active = true and t.name in ('Step Off Safely', 'Two-Foot Landing', 'Flip Board & Land', 'Jump On Board (Small Surface)', 'Wall Ride', 'Fakie Ollie')
 on conflict (skater_id, trick_id) do nothing;
 alter table public.media enable row level security;
 grant select, insert, update, delete on public.media to authenticated;

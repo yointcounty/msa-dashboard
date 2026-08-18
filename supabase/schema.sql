@@ -111,7 +111,9 @@ insert into public.tricks (name, sort_order, category) values
   ('Step Off Safely', 75, 'super_beginner'),
   ('Two-Foot Landing', 76, 'super_beginner'),
   ('Flip Board & Land', 77, 'super_beginner'),
-  ('Jump On Board (Small Surface)', 78, 'super_beginner')
+  ('Jump On Board (Small Surface)', 78, 'super_beginner'),
+  ('Wall Ride', 220, 'core'),
+  ('Fakie Ollie', 230, 'core')
 on conflict (name) do nothing;
 
 insert into storage.buckets (id, name, public) values ('skater-media', 'skater-media', false) on conflict (id) do nothing;
