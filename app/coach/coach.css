@@ -730,3 +730,73 @@
   z-index: 20;
   box-shadow: 6px 6px 0 var(--ink);
 }
+.coach-identity {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  margin-left: auto;
+  margin-right: 22px;
+  text-align: right;
+}
+.coach-identity b {
+  font-size: 13px;
+}
+.coach-identity small {
+  color: #667069;
+  font-size: 11px;
+}
+.coach-team-card {
+  margin: 22px 0;
+  padding: 22px 20px;
+  background: #fff;
+  border: 2px solid var(--ink);
+  display: grid;
+  grid-template-columns: 1fr 1.35fr;
+  gap: 24px;
+  align-items: start;
+}
+.coach-team-card h2 {
+  margin: 4px 0;
+  font-size: 24px;
+}
+.coach-team-card p:not(.eyebrow) {
+  margin: 5px 0;
+  color: #667069;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.coach-team-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.coach-team-row {
+  min-width: 0;
+  padding: 11px 12px;
+  background: #f4f7ed;
+  border: 1px solid #dce2dc;
+}
+.coach-team-row b,
+.coach-team-row small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+.coach-team-row small {
+  margin-top: 3px;
+  color: #667069;
+  font-size: 10px;
+  line-height: 1.35;
+}
+@media (max-width: 800px) {
+  .coach-identity {
+    align-items: flex-start;
+    margin-right: auto;
+    margin-left: 16px;
+    text-align: left;
+  }
+  .coach-team-card,
+  .coach-team-list {
+    grid-template-columns: 1fr;
+  }
+}

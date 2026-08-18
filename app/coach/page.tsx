@@ -29,6 +29,11 @@ type Family = {
   email: string;
   skater: Skater | null;
 };
+type CoachProfile = {
+  id: string;
+  parent_name: string | null;
+  email: string;
+};
 type Progress = {
   trick_id: string;
   status: string;
@@ -84,6 +89,8 @@ export default function CoachPortal() {
   const [coachId, setCoachId] = useState("");
   const [skaters, setSkaters] = useState<Skater[]>([]);
   const [families, setFamilies] = useState<Family[]>([]);
+  const [coachTeam, setCoachTeam] = useState<CoachProfile[]>([]);
+  const [coachProfile, setCoachProfile] = useState<CoachProfile | null>(null);
   const [familyDrafts, setFamilyDrafts] = useState<Record<string, string>>({});
   const [selected, setSelected] = useState("");
   const [progress, setProgress] = useState<Progress[]>([]);
@@ -122,7 +129,7 @@ export default function CoachPortal() {
     }
     const { data: profile } = await supabase
       .from("profiles")
-      .select("role")
+      .select("role,parent_name,email")
       .eq("id", auth.user.id)
       .single();
     if (profile?.role !== "coach") {
@@ -132,13 +139,16 @@ export default function CoachPortal() {
       return;
     }
     setCoachId(auth.user.id);
+    setCoachProfile({
+      id: auth.user.id,
+      parent_name: profile.parent_name || "MSA Coach",
+      email: profile.email || auth.user.email || "",
+    });
     setAuthorized(true);
-    const [{ data }, { data: familyRows }] = await Promise.all([
+    const [{ data: skaterRows, error: skaterError }, { data: familyRows, error: familyError }, { data: coachRows, error: coachError }] = await Promise.all([
       supabase
         .from("skaters")
-        .select(
-          "id,name,parent_user_id,profiles!skaters_parent_user_id_fkey(parent_name,email)",
-        )
+        .select("id,name,parent_user_id")
         .eq("active", true)
         .order("name"),
       supabase
@@ -146,20 +156,35 @@ export default function CoachPortal() {
         .select("id,parent_name,email")
         .eq("role", "family")
         .order("parent_name"),
+      supabase
+        .from("profiles")
+        .select("id,parent_name,email")
+        .eq("role", "coach")
+        .order("parent_name"),
     ]);
-    const list = (data || []) as unknown as Skater[];
+    if (skaterError || familyError || coachError) {
+      setSkaters([]);
+      setFamilies([]);
+      setCoachTeam([]);
+      setMessage(
+        skaterError?.message || familyError?.message || coachError?.message ||
+          "Coach records could not be loaded. Refresh and try again.",
+      );
+      return;
+    }
+    const familyProfiles = (familyRows || []) as CoachProfile[];
+    const profileById = new Map(familyProfiles.map((family) => [family.id, family]));
+    const list = ((skaterRows || []) as Array<Omit<Skater, "profiles">>).map((skater) => ({
+      ...skater,
+      profiles: profileById.get(skater.parent_user_id) || null,
+    }));
     setSkaters(list);
-    const nextFamilies = (
-      (familyRows || []) as Array<{
-        id: string;
-        parent_name: string | null;
-        email: string;
-      }>
-    ).map((family) => ({
+    const nextFamilies = familyProfiles.map((family) => ({
       ...family,
       skater: list.find((item) => item.parent_user_id === family.id) || null,
     }));
     setFamilies(nextFamilies);
+    setCoachTeam((coachRows || []) as CoachProfile[]);
     setFamilyDrafts((current) =>
       Object.fromEntries(
         nextFamilies.map((family) => [
@@ -922,6 +947,14 @@ export default function CoachPortal() {
             <small>COACH PORTAL</small>
           </span>
         </Link>
+        {coachProfile && (
+          <div className="coach-identity">
+            <b>{coachProfile.parent_name}</b>
+            <small>
+              {coachProfile.email === "jt@yointcounty.com" ? "Head coach" : "Authorized coach"} · {coachProfile.email}
+            </small>
+          </div>
+        )}
         <button
           onClick={async () => {
             await supabase.auth.signOut();
@@ -953,6 +986,25 @@ export default function CoachPortal() {
             <span>Family accounts</span>
           </div>
         </header>
+        <section className="coach-team-card">
+          <div>
+            <p className="eyebrow">
+              <span /> Coaching team
+            </p>
+            <h2>MSA coaches</h2>
+            <p>Authorized staff accounts stay connected to the same saved portal data.</p>
+          </div>
+          <div className="coach-team-list">
+            {coachTeam.map((coach) => (
+              <div className="coach-team-row" key={coach.id}>
+                <b>{coach.parent_name || "MSA Coach"}</b>
+                <small>
+                  {coach.email === "jt@yointcounty.com" ? "Head coach" : "Coach"} · {coach.email}
+                </small>
+              </div>
+            ))}
+          </div>
+        </section>
         <section className="account-controls">
           <div>
             <p className="eyebrow">
