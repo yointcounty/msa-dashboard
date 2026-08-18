@@ -394,7 +394,20 @@ export default function CoachTeamPage() {
             recorded automatically and do not replace or alter client data.
           </p>
 
-          <div style={{ display: "grid", gap: 8 }}>
+          <div
+            role="region"
+            aria-label="Scrollable coach activity history"
+            tabIndex={0}
+            style={{
+              display: "grid",
+              gap: 8,
+              maxHeight: 520,
+              overflowY: "auto",
+              overscrollBehavior: "contain",
+              padding: "2px 8px 2px 2px",
+              scrollbarWidth: "thin",
+            }}
+          >
             {activity.length === 0 && (
               <div style={{ background: "#fff", padding: 18, borderRadius: 14 }}>
                 No coach activity has been recorded yet. New work will appear
